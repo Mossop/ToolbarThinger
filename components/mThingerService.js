@@ -47,6 +47,62 @@ var mThingerService = {
 thingCache: null,
 namespace: "http://users.blueprintit.co.uk/~dave/web/firefox/Thinger",
 
+xmldochelper: {
+
+	install: function(document)
+	{
+		var self = this;
+		document.getElementById = function(id) { return self.getElementById(document, id); }
+		document.getElementsByAttribute = function(name, value) { return self.getElementsByAttribute(document, id); }
+ 	},
+
+	// Generic way to brute force search the document for attributes with a set value.
+	findAttributeInElement: function(node, attr, value, single, nodes)
+	{
+		//dump(node+" "+attr+" "+value+" "+single+"\n");
+		if ((node.hasAttribute(attr))&&(node.getAttribute(attr)==value))
+		{
+			//dump("Found\n");
+			nodes.push(node);
+			if (single)
+				return;
+		}
+		
+		node=node.firstChild;
+		while (node)
+		{
+			if (node.nodeType==node.ELEMENT_NODE)
+			{
+				this.findAttributeInElement(node, attr, value, single, nodes);
+				if (single && nodes.length>0)
+					return;
+				//dump("return: "+nodes.length+"\n");
+			}
+			node=node.nextSibling;
+		}
+		return nodes;
+	},
+	
+	// Our getElementById implementation returns the first element it finds with a matching attribute called "id"
+	getElementById: function(document, id)
+	{
+		var nodes = [];
+		this.findAttributeInElement(document.documentElement, "id", id, true, nodes);
+		if (nodes.length>0)
+			return nodes[0];
+
+		return null;
+	},
+	
+	// Returns a simple array of elements with the given attribute set. This will not update to reflect changes in the document.
+	getElementsByAttribute: function(document, name, value)
+	{
+		var nodes = [];
+		this.findAttributeInElement(document.documentElement, name, value, false, nodes);
+		return nodes;
+	}
+},
+
 loadFromFile: function(datafile)
 {
 	var cache = null;
@@ -58,6 +114,7 @@ loadFromFile: function(datafile)
 		                       .createInstance(Components.interfaces.nsIFileInputStream);
 		stream.init(datafile, 1, 0, Components.interfaces.nsIFileInputStream.CLOSE_ON_EOF);
 		
+		//cache = parser.parseFromString('<?xml version="1.0"?> <!DOCTYPE thinger SYSTEM "chrome://thinger/content/thinger.dtd"> <thinger xmlns="http://users.blueprintit.co.uk/~dave/web/firefox/Thinger" version="1"></thinger>', "text/xml");
 		cache = parser.parseFromStream(stream, "UTF8", datafile.fileSize, "text/xml");
 		stream.close();
 	}
@@ -79,6 +136,8 @@ loadFromFile: function(datafile)
 	if (cache.documentElement.namespaceURI!=this.namespace)
 		return false;
 
+	this.xmldochelper.install(cache);
+	
 	this.thingCache = cache;
 	
 	return true;
@@ -106,8 +165,6 @@ loadThings: function()
 		datafile = installLocation.getItemFile("Thinger@blueprintit.co.uk", "defaults/thinger.xml");
 		
 		this.loadFromFile(datafile);
-	
-		this.persistThings();
 	}
 },
 
@@ -142,12 +199,15 @@ createThing: function(toolbox)
 		items = things.createElementNS("http://users.blueprintit.co.uk/~dave/web/firefox/Thinger", "toolbox");
 		things.documentElement.appendChild(items);
 		items.setAttribute("id", node);
+		dump("Added: "+things.getElementById(node)+"\n");
 	}
 	
+	var uid = (new Date()).getTime();
 	var thing = things.createElementNS("http://users.blueprintit.co.uk/~dave/web/firefox/Thinger", "thing");
 	items.appendChild(thing);
-	thing.setAttribute("id", (new Date()).getTime());
+	thing.setAttribute("id", uid);
 	thing.setAttribute("type", "button");
+	dump("Added: "+things.getElementById(uid)+"\n");
 	
 	return this.createToolbarItem(toolbox.palette, thing);
 },
@@ -201,16 +261,23 @@ persistThings: function()
 	
 		try
 		{
-			var stream = Components.classes["@mozilla.org/network/file-output-stream;1"]
-			                       .createInstance(Components.interfaces.nsIFileOutputStream);
-			stream.init(datafile, 42, 0700, 0);
-			
-			var serializer = Components.classes["@mozilla.org/xmlextras/xmlserializer;1"]
-			                           .createInstance(Components.interfaces.nsIDOMSerializer);
-			serializer.serializeToStream(this.thingCache, stream, "UTF8");
-			
-			stream.flush();
-			stream.close();
+			if ((this.thingCache.documentElement)&&(this.thingCache.documentElement.firstChild))
+			{
+				var stream = Components.classes["@mozilla.org/network/file-output-stream;1"]
+				                       .createInstance(Components.interfaces.nsIFileOutputStream);
+				stream.init(datafile, 42, 0700, 0);
+				
+				var serializer = Components.classes["@mozilla.org/xmlextras/xmlserializer;1"]
+				                           .createInstance(Components.interfaces.nsIDOMSerializer);
+				serializer.serializeToStream(this.thingCache, stream, "UTF8");
+				
+				stream.flush();
+				stream.close();
+			}
+			else if (datafile.exists())
+			{
+				datafile.remove(false);
+			}
 		}
 		catch (e)
 		{
