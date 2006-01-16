@@ -50,11 +50,11 @@ var thinger = {
 	{
 		thinger.service = Components.classes["@blueprintit.co.uk/thinger-service;1"].getService(Components.interfaces.mIThingerService);
 
-		// Listen for item drops.
+		// Listen for things being removed from the toolbar.
 		var palette = document.getElementById("palette-box");
 		palette.addEventListener("DOMNodeInserted", thinger.itemAdded, false);
 		
-		// Listen for item creations.
+		// Listen for things being dropped onto the toolbar
 		var mypalette = document.getElementById("thinger-palette");
 		mypalette.addEventListener("DOMNodeRemoved", thinger.itemRemoved, false);
 		
@@ -64,11 +64,11 @@ var thinger = {
 	
 	accept: function(event)
 	{
-		// Wipe the custom items.
+		// Wipe the custom thing.
 		var mypalette = document.getElementById("thinger-palette");
 		thinger.deleteItem(mypalette.firstChild.firstChild);
 		
-		// Persist the item cache.
+		// Persist the thing cache.
 		thinger.service.persistThings();
 	},
 	
@@ -82,22 +82,20 @@ var thinger = {
 	{
 		var mypalette = document.getElementById("thinger-palette");
 		
+		// When items are dragged away their parent row's are deleted. This hbox simulates a row in the main palette.
 		var holder = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "hbox");
 		mypalette.appendChild(holder);
 		holder.id="thinger-holder";
 		
+		// Creates a new thing and a wrapper for it.
 		var newthing = thinger.service.createThing(gToolbox).cloneNode(true);
-
 		var wrapper = createWrapper(newthing.id);
-
 		wrapper.setAttribute("flex", 1);
 		wrapper.setAttribute("align", "center");
 		wrapper.setAttribute("pack", "center");
 		wrapper.setAttribute("minheight", "0");
 		wrapper.setAttribute("minwidth", "0");
-
 		wrapper.appendChild(newthing);
-		
 		cleanUpItemForPalette(newthing, wrapper);
 		
 		holder.appendChild(wrapper);
@@ -148,6 +146,7 @@ var thinger = {
 	
 	itemRemoved: function(event)
 	{
+		// The item holder is the last removed so when this is gone we re-create.
 		if (event.target.id.substring(0,16)=="thinger-holder")
 		{
 			thinger.createCustom();
