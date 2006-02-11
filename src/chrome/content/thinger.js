@@ -48,12 +48,15 @@ var thinger = {
 	
 	init: function(event)
 	{
-		this.service = Components.classes["@blueprintit.co.uk/thinger-service;1"].getService(Components.interfaces.mIThingerService);
+		this.service = Components.classes["@blueprintit.co.uk/thinger-service;1"]
+		                         .getService(Components.interfaces.mIThingerService);
 		
-		var toolbox = document.getElementById("navigator-toolbox");
+		var toolboxes = document.getElementsByTagNameNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "toolbox");
 
-		if (toolbox)
+		for (var i=0; i<toolboxes.length; i++)
 		{
+			var toolbox = toolboxes[i];
+
 			dump("calling import\n");
 			try
 			{
@@ -68,7 +71,8 @@ var thinger = {
 			var toolbars = toolbox.getElementsByTagName("toolbar");
 			for (var i=0; i<toolbars.length; i++)
 			{
-				// We have to force re-creation of any toolbar that contains a custom element. This could be cleaned up in the future somewhat.
+				// We have to force re-creation of any toolbar that contains a custom element.
+				// TODO This could be cleaned up in the future somewhat.
 				var set = toolbars[i].getAttribute("currentset");
 				if (set.indexOf("thinger-")>=0)
 					toolbars[i].currentSet=set;

@@ -59,15 +59,20 @@ var thinger = {
 		mypalette.addEventListener("DOMNodeRemoved", thinger.itemRemoved, false);
 		
 		// Create the custom items.
-		thinger.createCustom();
+		mypalette.appendChild(thinger.createCustom("bookmark"));
 	},
 	
 	accept: function(event)
 	{
 		// Wipe the custom thing.
 		var mypalette = document.getElementById("thinger-palette");
-		thinger.deleteItem(mypalette.firstChild.firstChild);
-		
+		var holder = mypalette.firstchild;
+		while (holder)
+		{
+			thinger.deleteItem(holder.firstChild);
+			holder=holder.nextSibling;
+		}
+				
 		// Persist the thing cache.
 		thinger.service.persistThings();
 	},
@@ -78,17 +83,14 @@ var thinger = {
 		thinger.service.deleteThing(item[0]);
 	},
 	
-	createCustom: function()
+	createCustom: function(type)
 	{
-		var mypalette = document.getElementById("thinger-palette");
-		
 		// When items are dragged away their parent row's are deleted. This hbox simulates a row in the main palette.
 		var holder = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "hbox");
-		mypalette.appendChild(holder);
-		holder.id="thinger-holder";
+		holder.className="thinger-holder";
 		
 		// Creates a new thing and a wrapper for it.
-		var newthing = thinger.service.createThing(gToolbox).cloneNode(true);
+		var newthing = thinger.service.createThing(gToolbox, type).cloneNode(true);
 		var wrapper = createWrapper(newthing.id);
 		wrapper.setAttribute("flex", 1);
 		wrapper.setAttribute("align", "center");
@@ -97,8 +99,9 @@ var thinger = {
 		wrapper.setAttribute("minwidth", "0");
 		wrapper.appendChild(newthing);
 		cleanUpItemForPalette(newthing, wrapper);
-		
 		holder.appendChild(wrapper);
+		
+		return holder;
 	},
 	
 	itemAdded: function(event)
@@ -147,9 +150,10 @@ var thinger = {
 	itemRemoved: function(event)
 	{
 		// The item holder is the last removed so when this is gone we re-create.
-		if (event.target.id.substring(0,16)=="thinger-holder")
+		if (event.target.className.substring(0,16)=="thinger-holder")
 		{
-			thinger.createCustom();
+			var mypalette = document.getElementById("thinger-palette");
+			mypalette.appendChild(thinger.createCustom("bookmark"));
 		}
 	}
 }

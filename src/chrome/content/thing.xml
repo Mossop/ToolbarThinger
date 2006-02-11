@@ -17,7 +17,7 @@
    -
    - The Initial Developer of the Original Code is
    -     Dave Townsend <dave.townsend@blueprintit.co.uk>.
-   - Portions created by the Initial Developer are Copyright (C) 2005
+   - Portions created by the Initial Developer are Copyright (C) 2006
    - the Initial Developer. All Rights Reserved.
    -
    - Contributor(s):
@@ -42,8 +42,33 @@
    - $Revision$
    -->
 
-<overlay id="ThingerOverlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+<bindings xmlns="http://www.mozilla.org/xbl"
+          xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-	<script type="application/x-javascript" src="chrome://thinger/content/browserOverlay.js"/>
+  <binding id="thing">
+    <implementation>
 
-</overlay>
+      <constructor>
+        var service = Components.classes["@blueprintit.co.uk/thinger-service;1"]
+                                .getService(Components.interfaces.mIThingerService);
+        this._settings = service.getThingSettings(this);
+        
+        this._rebuild();
+      </constructor>
+      
+      <field name="_settings">null</field>
+      <property name="settings" onget="return this._settings"/>
+
+      <method name="_rebuild">
+        <body>
+          while (this.firstChild)
+            this.removeChild(this.firstChild);
+            
+          
+        </body>
+      </method>
+      
+    </implementation>
+  </binding>
+  
+</bindings>

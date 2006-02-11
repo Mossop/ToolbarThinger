@@ -44,14 +44,6 @@
 
 <overlay id="ThingerOverlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-  <script type="application/x-javascript" src="customizeToolbar.js"/>
-  
-  <vbox id="main-box">
-    <vbox insertafter="palette-box" id="thinger-palette"
-          ondraggesture="nsDragAndDrop.startDrag(event, dragStartObserver);"
-          ondragover="nsDragAndDrop.dragOver(event, paletteDNDObserver);"
-          ondragdrop="nsDragAndDrop.drop(event, paletteDNDObserver);">
-    </vbox>
-  </vbox>
-  
+	<script type="application/x-javascript" src="thinger.js"/>
+
 </overlay>

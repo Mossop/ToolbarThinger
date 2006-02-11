@@ -185,7 +185,7 @@ createToolbarItem: function(palette, thing)
 	return item;
 },
 
-createThing: function(toolbox)
+createThing: function(toolbox, type)
 {
 	var things = this.things;
 	
@@ -206,10 +206,16 @@ createThing: function(toolbox)
 	var thing = things.createElementNS("http://users.blueprintit.co.uk/~dave/web/firefox/Thinger", "thing");
 	items.appendChild(thing);
 	thing.setAttribute("id", uid);
-	thing.setAttribute("type", "button");
+	thing.setAttribute("type", type);
 	dump("Added: "+things.getElementById(uid)+"\n");
 	
 	return this.createToolbarItem(toolbox.palette, thing);
+},
+
+getThingSettings: function(item)
+{
+	var id = item.getAttribute("id").substring(8);
+	return this.things.getElementById(id);
 },
 
 deleteThing: function(item)
