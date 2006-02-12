@@ -42,6 +42,11 @@
  *
  */
 
+function LOG(text)
+{
+	dump("*** ThingerService: "+text+"\n");
+}
+
 var mThingerService = {
 
 thingCache: null,
@@ -59,10 +64,10 @@ xmldochelper: {
 	// Generic way to brute force search the document for attributes with a set value.
 	findAttributeInElement: function(node, attr, value, single, nodes)
 	{
-		//dump(node+" "+attr+" "+value+" "+single+"\n");
+		//LOG(node+" "+attr+" "+value+" "+single+"\n");
 		if ((node.hasAttribute(attr))&&(node.getAttribute(attr)==value))
 		{
-			//dump("Found\n");
+			//LOG("Found\n");
 			nodes.push(node);
 			if (single)
 				return;
@@ -76,7 +81,7 @@ xmldochelper: {
 				this.findAttributeInElement(node, attr, value, single, nodes);
 				if (single && nodes.length>0)
 					return;
-				//dump("return: "+nodes.length+"\n");
+				//LOG("return: "+nodes.length+"\n");
 			}
 			node=node.nextSibling;
 		}
@@ -120,7 +125,7 @@ loadFromFile: function(datafile)
 	}
 	catch (e)
 	{
-		dump(e+"\n");
+		LOG(e+"\n");
 		return false;
 	}
 
@@ -178,9 +183,9 @@ get things()
 createToolbarItem: function(palette, thing)
 {
 	var item = palette.ownerDocument.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul",
-	                                                 "toolbarbutton");
+	                                                 "toolbaritem");
 	item.setAttribute("id", "thinger-"+thing.getAttribute("id"));
-	item.setAttribute("label", "New Thinger");
+	item.setAttribute("class", "thinger-item thinger-bookmark");
 	palette.appendChild(item);
 	return item;
 },
@@ -199,7 +204,7 @@ createThing: function(toolbox, type)
 		items = things.createElementNS("http://users.blueprintit.co.uk/~dave/web/firefox/Thinger", "toolbox");
 		things.documentElement.appendChild(items);
 		items.setAttribute("id", node);
-		dump("Added: "+things.getElementById(node)+"\n");
+		LOG("Added toolbox: "+node);
 	}
 	
 	var uid = (new Date()).getTime();
@@ -207,7 +212,7 @@ createThing: function(toolbox, type)
 	items.appendChild(thing);
 	thing.setAttribute("id", uid);
 	thing.setAttribute("type", type);
-	dump("Added: "+things.getElementById(uid)+"\n");
+	LOG("Added: "+uid);
 	
 	return this.createToolbarItem(toolbox.palette, thing);
 },
@@ -232,6 +237,11 @@ deleteThing: function(item)
 		items.removeChild(thing);
 		if (!items.firstChild)
 			items.parentNode.removeChild(items);
+		LOG("Deleted: "+item.getAttribute("id").substring(8));
+	}
+	else
+	{
+		LOG("Could not find thing to delete - "+item.getAttribute("id"));
 	}
 },
 
@@ -249,6 +259,7 @@ importThings: function(toolbox)
 		var thing = items.firstChild;
 		while (thing)
 		{
+			LOG("Importing: "+thing.getAttribute("id"));
 			this.createToolbarItem(toolbox.palette, thing);
 			thing=thing.nextSibling;
 		}
@@ -287,7 +298,7 @@ persistThings: function()
 		}
 		catch (e)
 		{
-			dump(e+"\n");
+			LOG(e+"\n");
 		}
 	}
 },

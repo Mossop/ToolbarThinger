@@ -45,30 +45,109 @@
 <bindings xmlns="http://www.mozilla.org/xbl"
           xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-  <binding id="thing">
-    <implementation>
+  <binding id="thing" display="xul:hbox">
+    <content>
+      <label value="New thinger"/>
+    </content>
 
+    <implementation>
+      
       <constructor>
         var service = Components.classes["@blueprintit.co.uk/thinger-service;1"]
                                 .getService(Components.interfaces.mIThingerService);
         this._settings = service.getThingSettings(this);
         
-        this._rebuild();
+        this._init();
       </constructor>
+      
+      <destructor>
+        this._destroy();
+      </destructor>
       
       <field name="_settings">null</field>
       <property name="settings" onget="return this._settings"/>
+      
+      <method name="_init">
+        <body>
+        </body>
+      </method>
 
+      <method name="_destroy">
+        <body>
+        </body>
+      </method>
+
+    </implementation>
+  </binding>
+  
+  <binding id="bookmark" extends="chrome://thinger/content/thing.xml#thing">
+    <content>
+    </content>
+    
+    <implementation>
+      <field name="_button">null</field>
+      <field name="_bms">null</field>
+      <field name="_places">null</field>
+      <field name="_result">null</field>
+      <field name="_resultNode">null</field>
+      
+      <method name="_init">
+        <body>
+          this._places = Components.classes["@mozilla.org/browser/nav-history-service;1"]
+                                   .getService(Components.interfaces.nsINavHistoryService);
+          this._bms = Components.classes["@mozilla.org/browser/nav-bookmarks-service;1"]
+                                .getService(Components.interfaces.nsINavBookmarksService);
+
+          var query = this._places.getNewQuery();
+          query.setFolders([this._bms.toolbarRoot], 1); 
+          var options = this._places.getNewQueryOptions();
+          options.setGroupingMode([Components.interfaces.nsINavHistoryQueryOptions.GROUP_BY_FOLDER], 1);
+          options.expandQueries = true;
+          this._result = this._places.executeQuery(query, options);
+          this._resultNode = this._result.root;
+          this._rebuild();
+        </body>
+      </method>
+      
+      <method name="_destroy">
+        <body>
+        </body>
+      </method>
+      
       <method name="_rebuild">
         <body>
           while (this.firstChild)
             this.removeChild(this.firstChild);
-            
           
+          var button = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "toolbarbutton");
+          button.setAttribute("label", this._resultNode.title);
+          if (PlacesController.nodeIsURI(this._resultNode))
+          {
+            button.setAttribute("url", this._resultNode.uri);
+          }
+          else if (PlacesController.nodeIsContainer(this._resultNode))
+          {
+            button.setAttribute("type", "menu");
+            button.setAttribute("container", "true");
+            var popup = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "menupopup");
+            popup.setAttribute("type", "places");
+            // This is set here and not in the XBL constructor for the menu because
+            // it doesn't get initialized properly in the constructor.
+            popup.setAttribute("context", "placesContext");
+            button.appendChild(popup);
+            popup._result = this._result;
+            popup._resultNode = this._resultNode;
+          }
+          if (this._resultNode.icon)
+            button.setAttribute("image", this._resultNode.icon.spec);
+          button.className = "menuitem-iconic bookmark-item";
+          button.node = this._resultNode;
+          this.appendChild(button);
         </body>
       </method>
       
     </implementation>
+    
   </binding>
   
 </bindings>

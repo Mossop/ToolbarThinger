@@ -42,6 +42,8 @@
    - $Revision$
    -->
 
+<?xml-stylesheet href="chrome://thinger/content/bindings.css" type="text/css"?>
+
 <overlay id="ThingerOverlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
 	<script type="application/x-javascript" src="thinger.js"/>

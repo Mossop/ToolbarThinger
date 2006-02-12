@@ -66,7 +66,7 @@ var thinger = {
 	{
 		// Wipe the custom thing.
 		var mypalette = document.getElementById("thinger-palette");
-		var holder = mypalette.firstchild;
+		var holder = mypalette.firstChild;
 		while (holder)
 		{
 			thinger.deleteItem(holder.firstChild);
@@ -79,8 +79,7 @@ var thinger = {
 	
 	deleteItem: function(wrapper)
 	{
-		var item = gToolbox.palette.getElementsByAttribute("id",wrapper.id.substring(8));
-		thinger.service.deleteThing(item[0]);
+		thinger.service.deleteThing(wrapper.firstChild);
 	},
 	
 	createCustom: function(type)

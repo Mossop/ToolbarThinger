@@ -1,0 +1,3 @@
+.thinger-item {
+  -moz-binding: url('chrome://thinger/content/thing.xml#thing');
+}

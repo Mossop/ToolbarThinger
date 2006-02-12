@@ -44,13 +44,14 @@
 #include "nsISupports.idl"
 
 interface nsIDOMXULElement;
+interface nsIDOMElement;
 
 [scriptable, uuid(71c2b345-cc26-4be3-b9d9-8c9384771687)]
 interface mIThingerService : nsISupports
 {
 	nsIDOMXULElement createThing(in nsIDOMXULElement toolbox, in AString type);
 	
-	nsIDOMXULElement getThingSettings(in nsIDOMXULElement thing);
+	nsIDOMElement getThingSettings(in nsIDOMXULElement thing);
 	
 	void deleteThing(in nsIDOMXULElement thing);
 	
