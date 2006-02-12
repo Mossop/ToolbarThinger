@@ -59,18 +59,30 @@ var thinger = {
 		mypalette.addEventListener("DOMNodeRemoved", thinger.itemRemoved, false);
 		
 		// Create the custom items.
-		mypalette.appendChild(thinger.createCustom("bookmark"));
+		mypalette.firstChild.appendChild(thinger.createCustom("bookmark"));
+		mypalette.firstChild.appendChild(thinger.createCustom("script"));
+
+		var spacer = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul",
+		                                      "spacer");
+		spacer.setAttribute("flex", "0");
+		mypalette.firstChild.appendChild(spacer);
 	},
 	
 	accept: function(event)
 	{
 		// Wipe the custom thing.
 		var mypalette = document.getElementById("thinger-palette");
-		var holder = mypalette.firstChild;
-		while (holder)
+		var row = mypalette.firstChild;
+		while (row)
 		{
-			thinger.deleteItem(holder.firstChild);
-			holder=holder.nextSibling;
+			var wrapper = row.firstChild;
+			while (wrapper)
+			{
+				if (wrapper.id.substring(0,16)=="wrapper-thinger-")
+					thinger.deleteItem(wrapper);
+				wrapper=wrapper.nextSibling;
+			}
+			row=row.nextSibling;
 		}
 				
 		// Persist the thing cache.
@@ -79,15 +91,19 @@ var thinger = {
 	
 	deleteItem: function(wrapper)
 	{
+    var paletteItem = gToolbox.palette.firstChild;
+    while (paletteItem)
+    {
+      if (paletteItem.id == wrapper.firstChild.id)
+      	gToolbox.palette.removeChild(paletteItem)
+
+      paletteItem = paletteItem.nextSibling;
+    }
 		thinger.service.deleteThing(wrapper.firstChild);
 	},
 	
 	createCustom: function(type)
 	{
-		// When items are dragged away their parent row's are deleted. This hbox simulates a row in the main palette.
-		var holder = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "hbox");
-		holder.className="thinger-holder";
-		
 		// Creates a new thing and a wrapper for it.
 		var newthing = thinger.service.createThing(gToolbox, type).cloneNode(true);
 		var wrapper = createWrapper(newthing.id);
@@ -98,9 +114,8 @@ var thinger = {
 		wrapper.setAttribute("minwidth", "0");
 		wrapper.appendChild(newthing);
 		cleanUpItemForPalette(newthing, wrapper);
-		holder.appendChild(wrapper);
 		
-		return holder;
+		return wrapper;
 	},
 	
 	itemAdded: function(event)
@@ -149,10 +164,17 @@ var thinger = {
 	itemRemoved: function(event)
 	{
 		// The item holder is the last removed so when this is gone we re-create.
-		if (event.target.className.substring(0,16)=="thinger-holder")
+		if (event.target.id.substring(0,16)=="wrapper-thinger-")
 		{
-			var mypalette = document.getElementById("thinger-palette");
-			mypalette.appendChild(thinger.createCustom("bookmark"));
+			dump("Detected item removal\n");
+			var type = event.target.firstChild.getAttribute("thingtype");
+			event.target.parentNode.insertBefore(thinger.createCustom(type), event.target.nextSibling);
+			var spacer = event.target.parentNode.lastChild;
+			if (spacer.localName=="spacer")
+			{
+				var flex = spacer.getAttribute("flex");
+				spacer.setAttribute("flex", --flex);
+			}
 		}
 	}
 }

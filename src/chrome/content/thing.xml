@@ -45,9 +45,9 @@
 <bindings xmlns="http://www.mozilla.org/xbl"
           xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-  <binding id="thing" display="xul:hbox">
+  <binding id="thing" display="xul:toolbaritem">
     <content>
-      <label value="New thinger"/>
+      <xul:label value="New thinger"/>
     </content>
 
     <implementation>
@@ -80,6 +80,22 @@
     </implementation>
   </binding>
   
+  <binding id="script" extends="chrome://thinger/content/thing.xml#thing">
+    <content>
+      <xul:toolbarbutton label="New JavaScript Thinger"/>
+    </content>
+    
+    <implementation>
+    </implementation>
+
+    <handlers>
+      <handler event="command">
+        alert("hello!");
+      </handler>
+    </handlers>
+
+  </binding>
+
   <binding id="bookmark" extends="chrome://thinger/content/thing.xml#thing">
     <content>
     </content>

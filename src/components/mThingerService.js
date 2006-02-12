@@ -185,9 +185,19 @@ createToolbarItem: function(palette, thing)
 	var item = palette.ownerDocument.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul",
 	                                                 "toolbaritem");
 	item.setAttribute("id", "thinger-"+thing.getAttribute("id"));
-	item.setAttribute("class", "thinger-item thinger-bookmark");
+	item.setAttribute("class", "thinger-item");
+	item.setAttribute("thingtype", thing.getAttribute("type"));
 	palette.appendChild(item);
 	return item;
+},
+
+createUID: function()
+{
+	var uid = (new Date()).getTime();
+	while (this.things.getElementById(uid))
+		uid++;
+		
+	return uid;
 },
 
 createThing: function(toolbox, type)
@@ -207,7 +217,7 @@ createThing: function(toolbox, type)
 		LOG("Added toolbox: "+node);
 	}
 	
-	var uid = (new Date()).getTime();
+	var uid = this.createUID();
 	var thing = things.createElementNS("http://users.blueprintit.co.uk/~dave/web/firefox/Thinger", "thing");
 	items.appendChild(thing);
 	thing.setAttribute("id", uid);
@@ -228,8 +238,7 @@ deleteThing: function(item)
 	var things = this.things;
 	
 	var id = item.getAttribute("id").substring(8);
-	item.parentNode.removeChild(item);
-	
+		
 	var thing = things.getElementById(id);
 	if (thing)
 	{
