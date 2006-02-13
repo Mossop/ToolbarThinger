@@ -47,7 +47,7 @@
 
   <binding id="thing" display="xul:toolbaritem">
     <content>
-      <xul:label value="New thinger"/>
+      <xul:toolbarbutton label="New thinger"/>
     </content>
 
     <implementation>
@@ -57,7 +57,13 @@
                                 .getService(Components.interfaces.mIThingerService);
         this._settings = service.getThingSettings(this);
         
-        this._init();
+        while (this.firstChild)
+          this.removeChild(this.firstChild);
+          
+        if (this.parentNode.localName == "toolbar")
+          this._init();
+        else
+          this._designinit();
       </constructor>
       
       <destructor>
@@ -67,6 +73,11 @@
       <field name="_settings">null</field>
       <property name="settings" onget="return this._settings"/>
       
+      <method name="_designinit">
+        <body>
+        </body>
+      </method>
+      
       <method name="_init">
         <body>
         </body>
@@ -75,7 +86,10 @@
       <method name="_update">
         <body>
           this._destroy();
-          this._init();
+          if (this.parentNode.localName == "toolbar")
+            this._init();
+          else
+            this._preinit();
         </body>
       </method>
 
@@ -85,9 +99,28 @@
       </method>
 
     </implementation>
+    
   </binding>
   
-  <binding id="script" extends="chrome://thinger/content/thing.xml#thing">
+  <binding id="button-thing" extends="chrome://thinger/content/thing.xml#thing">
+    <implementation>
+      <field name="_button">document.getAnonymousNodes(this)[0]</field>
+      
+      <method name="_designinit">
+        <body>
+          if (this._settings.hasAttribute("label"))
+            this._button.setAttribute("label", this._settings.getAttribute("label"));
+
+          if (this._settings.hasAttribute("image"))
+            this._button.setAttribute("image", this._settings.getAttribute("image"));
+        </body>
+      </method>
+      
+    </implementation>
+  </binding>
+
+      
+  <binding id="script" extends="chrome://thinger/content/thing.xml#button-thing">
     <content>
       <xul:toolbarbutton label="New JavaScript Thinger"/>
     </content>
@@ -142,12 +175,12 @@
 
   </binding>
 
-  <binding id="bookmark" extends="chrome://thinger/content/thing.xml#thing">
+  <binding id="bookmark" extends="chrome://thinger/content/thing.xml#button-thing">
     <content>
+      <xul:toolbarbutton label="New Bookmark Thinger" class="menuitem-iconic bookmark-item"/>
     </content>
-    
+
     <implementation>
-      <field name="_button">null</field>
       <field name="_bms">null</field>
       <field name="_places">null</field>
       <field name="_result">null</field>
@@ -171,40 +204,40 @@
         </body>
       </method>
       
-      <method name="_destroy">
-        <body>
-        </body>
-      </method>
-      
       <method name="_rebuild">
         <body>
           while (this.firstChild)
             this.removeChild(this.firstChild);
           
-          var button = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "toolbarbutton");
-          button.setAttribute("label", this._resultNode.title);
+          this._button.setAttribute("label", this._resultNode.title);
+          this._settings.setAttribute("label", this._resultNode.title);
           if (PlacesController.nodeIsURI(this._resultNode))
           {
-            button.setAttribute("url", this._resultNode.uri);
+            this._button.setAttribute("url", this._resultNode.uri);
+            this._button.removeAttribute("type");
+            this._button.removeAttribute("container");
+            if (this._button.firstChild)
+              this._button.removeChild(this._button.firstChild);
           }
           else if (PlacesController.nodeIsContainer(this._resultNode))
           {
-            button.setAttribute("type", "menu");
-            button.setAttribute("container", "true");
+            this._button.setAttribute("type", "menu");
+            this._button.setAttribute("container", "true");
             var popup = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "menupopup");
             popup.setAttribute("type", "places");
             // This is set here and not in the XBL constructor for the menu because
             // it doesn't get initialized properly in the constructor.
             popup.setAttribute("context", "placesContext");
-            button.appendChild(popup);
+            this._button.appendChild(popup);
             popup._result = this._result;
             popup._resultNode = this._resultNode;
           }
           if (this._resultNode.icon)
-            button.setAttribute("image", this._resultNode.icon.spec);
-          button.className = "menuitem-iconic bookmark-item";
-          button.node = this._resultNode;
-          this.appendChild(button);
+          {
+            this._button.setAttribute("image", this._resultNode.icon.spec);
+            this._settings.setAttribute("image", this._resultNode.icon.spec);
+          }
+          this._button.node = this._resultNode;
         </body>
       </method>
       
