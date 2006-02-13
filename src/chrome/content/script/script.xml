@@ -42,10 +42,59 @@
    - $Revision$
    -->
 
-<?xml-stylesheet href="chrome://thinger/content/bindings/bindings.css" type="text/css"?>
+<bindings xmlns="http://www.mozilla.org/xbl"
+          xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-<overlay id="ThingerOverlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <binding id="script" extends="chrome://thinger/content/bindings/thing.xml#button-thing">
+    <content>
+      <xul:toolbarbutton label="New JavaScript Thinger"/>
+    </content>
+    
+    <implementation>
+      <field name="_script">null</field>
+      
+      <method name="_init">
+        <body>
+        <![CDATA[
+          var text = "";
+          var code = this._getText("code", null);
+          if (code)
+            this._script = new Function("event", "document", "window", code);
+        ]]>
+        </body>
+      </method>
+      
+      <method name="onCommand">
+        <parameter name="event"/>
+        <body>
+          this._configure("chrome://thinger/content/script/options.xul");
+          return;
+          var doc = document;
+          var win = window;
+          if (false)
+          {
+            var browser = document.getElementById("content");
+            doc = browser.contentDocument;
+            win = browser.contentWindow;
+          }
+          
+          if (this._script)
+            this._script.call(this, event, doc, win);
+        </body>
+      </method>
+    </implementation>
 
-	<script type="application/x-javascript" src="thinger.js"/>
+    <handlers>
+      <handler event="command">
+        this.onCommand(event);
+      </handler>
+      
+      <handler event="click">
+        if (event.button==1)
+          this.onCommand(event);
+      </handler>
+    </handlers>
 
-</overlay>
+  </binding>
+
+</bindings>

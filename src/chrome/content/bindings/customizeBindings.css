@@ -1,0 +1,7 @@
+.thinger-item[thingtype="bookmark"] {
+  -moz-binding: url('chrome://thinger/content/bookmark/bookmark.xml#bookmark');
+}
+
+.thinger-item[thingtype="script"] {
+  -moz-binding: url('chrome://thinger/content/script/script.xml#script');
+}

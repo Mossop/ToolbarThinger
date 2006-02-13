@@ -1,0 +1,179 @@
+<?xml version="1.0"?>
+
+ <!-- ***** BEGIN LICENSE BLOCK *****
+   - Version: MPL 1.1/GPL 2.0/LGPL 2.1
+   -
+   - The contents of this file are subject to the Mozilla Public License Version
+   - 1.1 (the "License"); you may not use this file except in compliance with
+   - the License. You may obtain a copy of the License at
+   - http://www.mozilla.org/MPL/
+   -
+   - Software distributed under the License is distributed on an "AS IS" basis,
+   - WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+   - for the specific language governing rights and limitations under the
+   - License.
+   -
+   - The Original Code is Firefox Toolbar Thinger.
+   -
+   - The Initial Developer of the Original Code is
+   -     Dave Townsend <dave.townsend@blueprintit.co.uk>.
+   - Portions created by the Initial Developer are Copyright (C) 2006
+   - the Initial Developer. All Rights Reserved.
+   -
+   - Contributor(s):
+   -
+   - Alternatively, the contents of this file may be used under the terms of
+   - either the GNU General Public License Version 2 or later (the "GPL"), or
+   - the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+   - in which case the provisions of the GPL or the LGPL are applicable instead
+   - of those above. If you wish to allow use of your version of this file only
+   - under the terms of either the GPL or the LGPL, and not to allow others to
+   - use your version of this file under the terms of the MPL, indicate your
+   - decision by deleting the provisions above and replace them with the notice
+   - and other provisions required by the LGPL or the GPL. If you do not delete
+   - the provisions above, a recipient may use your version of this file under
+   - the terms of any one of the MPL, the GPL or the LGPL.
+   -
+   - ***** END LICENSE BLOCK *****
+   -
+   - $HeadURL$
+   - $LastChangedBy$
+   - $Date$
+   - $Revision$
+   -->
+
+<bindings xmlns="http://www.mozilla.org/xbl"
+          xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+  <binding id="thing" display="xul:toolbaritem">
+    <content>
+      <xul:toolbarbutton label="New thinger"/>
+    </content>
+
+    <implementation>
+      
+      <constructor>
+        var service = Components.classes["@blueprintit.co.uk/thinger-service;1"]
+                                .getService(Components.interfaces.mIThingerService);
+        this._settings = service.getThingSettings(this);
+        
+        while (this.firstChild)
+          this.removeChild(this.firstChild);
+          
+        this._startup();
+      </constructor>
+      
+      <destructor>
+        this._destroy();
+      </destructor>
+      
+      <field name="_settings">null</field>
+      <property name="settings" onget="return this._settings"/>
+      
+      <method name="_getAttribute">
+        <parameter name="name"/>
+        <parameter name="def"/>
+        <body>
+          if (!this._settings.hasAttribute(name))
+            return def;
+            
+          return this._settings.getAttribute(name);
+        </body>
+      </method>
+      
+      <method name="_getText">
+        <parameter name="name"/>
+        <parameter name="def"/>
+        <body>
+          var node = this._settings;
+          
+          if (name)
+          {
+            node = node.getElementsByTagName(name);
+            if (!node || node.length==0)
+              return def;
+          }
+          
+          var result = "";
+          node = node.firstChild;
+          while (node)
+          {
+            if (node.nodeType == Node.TEXT_NODE)
+              result += node.nodeValue;
+
+            node = node.nextSibling;
+          }
+          return result;
+        </body>
+      </method>
+      
+      <method name="_startup">
+        <body>
+          if (this.parentNode.localName == "toolbar")
+            this._init();
+          else
+            this._designinit();
+        </body>
+      </method>
+      
+      <method name="_designinit">
+        <body>
+        </body>
+      </method>
+      
+      <method name="_init">
+        <body>
+        </body>
+      </method>
+      
+      <method name="_configure">
+        <parameter name="uri"/>
+        <body>
+          var args = {
+            settings: this._settings
+          };
+          var win = window.openDialog(uri, "thingerconfig", "chrome,titlebar,toolbar,centerscreen,modal", args);
+          win.addEventListener("unload", this._update, false);
+        </body>
+      </method>
+      
+      <method name="_update">
+        <body>
+          this._destroy();
+          this._startup();
+        </body>
+      </method>
+
+      <method name="_destroy">
+        <body>
+        </body>
+      </method>
+
+    </implementation>
+    
+  </binding>
+  
+  <binding id="button-thing" extends="chrome://thinger/content/bindings/thing.xml#thing">
+    <implementation>
+      <field name="_button">document.getAnonymousNodes(this)[0]</field>
+      
+      <method name="_designinit">
+        <body>
+          if (this._settings.hasAttribute("label"))
+            this._button.setAttribute("label", this._settings.getAttribute("label"));
+
+          if (this._settings.hasAttribute("image"))
+            this._button.setAttribute("image", this._settings.getAttribute("image"));
+        </body>
+      </method>
+      
+      <method name="_init">
+        <body>
+          this._designinit();
+        </body>
+      </method>
+      
+    </implementation>
+  </binding>
+
+</bindings>
