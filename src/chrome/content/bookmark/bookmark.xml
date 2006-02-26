@@ -64,7 +64,18 @@
                                 .getService(Components.interfaces.nsINavBookmarksService);
 
           var query = this._places.getNewQuery();
-          query.setFolders([this._bms.toolbarRoot], 1); 
+          if (this._getAttribute("folder", "true")=="true")
+          {
+            query.setFolders([this._getAttribute("root", this._bms.toolbarRoot)], 1); 
+          }
+          else
+          {
+            var uri = Components.classes["@mozilla.org/network/simple-uri;1"]
+                                .createInstance(Components.interfaces.nsIURI);
+            uri.spec = this._getAttribute("root","");
+            query.uri=uri;
+          }
+
           var options = this._places.getNewQueryOptions();
           options.setGroupingMode([Components.interfaces.nsINavHistoryQueryOptions.GROUP_BY_FOLDER], 1);
           options.expandQueries = true;
@@ -108,11 +119,21 @@
             this._settings.setAttribute("image", this._resultNode.icon.spec);
           }
           this._button.node = this._resultNode;
+          this._service.persistThings();
         </body>
       </method>
       
     </implementation>
-    
+    <handlers>
+      <handler event="click">
+        if (event.button==2)
+        {
+          this._configure("chrome://thinger/content/bookmark/options.xul");
+          event.stopPropagation();
+          event.preventDefault();
+        }
+      </handler>
+    </handlers>
   </binding>
 
 </bindings>

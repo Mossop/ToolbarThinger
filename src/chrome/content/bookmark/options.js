@@ -42,69 +42,41 @@
  *
  */
 
-var settings = window.arguments[0].settings;
-var thing = window.arguments[0].thing;
+var tree;
+var places = Components.classes["@mozilla.org/browser/nav-history-service;1"]
+                       .getService(Components.interfaces.nsINavHistoryService);
+var bms = Components.classes["@mozilla.org/browser/nav-bookmarks-service;1"]
+                    .getService(Components.interfaces.nsINavBookmarksService);
 
-function persistSettings()
+function onLoad()
 {
-	var service = Components.classes["@blueprintit.co.uk/thinger-service;1"]
-	                        .getService(Components.interfaces.mIThingerService);
-	service.persistThings();
-	thing.update();
+	tree = document.getElementById("placeContent");  
+	tree.controllers.appendController(PlacesController);
+	tree.init(new ViewConfig(ViewConfig.GENERIC_DROP_TYPES,
+													 ViewConfig.GENERIC_DROP_TYPES,
+													 false, false, 0, true));
+
+  var query = places.getNewQuery();
+  query.setFolders([bms.placesRoot], 1);
+  query.onlyBookmarked=true;
+  var options = places.getNewQueryOptions();
+  options.setGroupingMode([Components.interfaces.nsINavHistoryQueryOptions.GROUP_BY_FOLDER], 1);
+  options.expandQueries = true;
+	tree.load([query], options);
 }
 
-function getAttribute(name, def)
+function onAccept()
 {
-  if (!settings.hasAttribute(name))
-    return def;
-    
-  return settings.getAttribute(name);
-}
-
-function setAttribute(name, value)
-{
-	settings.setAttribute(name, value);
-}
-
-function getText(name, def)
-{
-  var node = settings;
-  
-  if (name)
-  {
-    node = node.getElementsByTagName(name);
-    if (!node || node.length==0)
-      return def;
-    node = node[0];
-  }
-  
-  var result = "";
-  node = node.firstChild;
-  while (node)
-  {
-    if (node.nodeType == Node.TEXT_NODE)
-      result += node.nodeValue;
-
-    node = node.nextSibling;
-  }
-  return result;
-}
-
-function setText(name, value)
-{
-	var node = settings;
-	
-	if (name)
+	var node = tree.selectedNode;
+	if (PlacesController.nodeIsURI(node))
 	{
-		node = node.getElementsByTagName(name);
-		if (!node || node.length==0)
-		{
-			node = settings.ownerDocument.createElement(name);
-			settings.appendChild(node);
-		}
-		else
-			node = node[0];
+		setAttribute("root", node.uri);
+		setAttribute("folder", "false");
 	}
-	
-	node.appendChild(node.ownerDocument.createTextNode(value));
+	else if (PlacesController.nodeIsFolder(node))
+	{
+		setAttribute("root", asFolder(node).folderId);
+		setAttribute("folder", "true");
+	}
+	persistSettings();
 }

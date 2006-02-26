@@ -53,8 +53,8 @@
     <implementation>
       
       <constructor>
-        var service = Components.classes["@blueprintit.co.uk/thinger-service;1"]
-                                .getService(Components.interfaces.mIThingerService);
+        this._service = Components.classes["@blueprintit.co.uk/thinger-service;1"]
+                                  .getService(Components.interfaces.mIThingerService);
         this._settings = service.getThingSettings(this);
         
         while (this.firstChild)
@@ -67,6 +67,7 @@
         this._destroy();
       </destructor>
       
+      <field name="_service">null</field>
       <field name="_settings">null</field>
       <property name="settings" onget="return this._settings"/>
       
@@ -78,6 +79,15 @@
             return def;
             
           return this._settings.getAttribute(name);
+        </body>
+      </method>
+      
+      <method name="_setAttribute">
+        <parameter name="name"/>
+        <parameter name="value"/>
+        <body>
+          return this._settings.setAttribute(name, value);
+          this._service.persistThings();
         </body>
       </method>
       
@@ -130,15 +140,16 @@
         <parameter name="uri"/>
         <body>
           var args = {
-            settings: this._settings
+            settings: this._settings,
+            thing: this
           };
-          var win = window.openDialog(uri, "thingerconfig", "chrome,titlebar,toolbar,centerscreen,modal", args);
-          win.addEventListener("unload", this._update, false);
+          window.openDialog(uri, "thingerconfig", "chrome,titlebar,toolbar,centerscreen,modal", args);
         </body>
       </method>
       
-      <method name="_update">
+      <method name="update">
         <body>
+          dump("Rebuilding\n");
           this._destroy();
           this._startup();
         </body>
