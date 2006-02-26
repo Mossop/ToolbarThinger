@@ -55,7 +55,6 @@
       <field name="_places">null</field>
       <field name="_result">null</field>
       <field name="_resultNode">null</field>
-      <field name="_selection">null</field>
         
       <method name="_init">
         <body>
@@ -151,7 +150,7 @@
       
       <property name="hasSelection">
         <getter><![CDATA[ 
-          return this._selection != null;
+          return this._resultNode != null;
         ]]></getter>
       </property>
       
@@ -189,7 +188,7 @@
       
       <property name="selectedNode">
         <getter><![CDATA[ 
-          return this.hasSelection ? this._selection : null;
+          return this.hasSelection ? this._resultNode : null;
         ]]></getter>
       </property>
       
@@ -226,7 +225,6 @@
         if (event.target != this)
           return;
         
-        this._selection = this._resultNode;
         PlacesController.activeView = this;
         PlacesController.mouseLoadURI(event);
       </handler>
@@ -235,7 +233,6 @@
         if ((event.button == 0) || (event.target != this))
           return;
 
-        this._selection = this._resultNode;
         PlacesController.activeView = this;
         document.commandDispatcher.updateCommands("click");
 

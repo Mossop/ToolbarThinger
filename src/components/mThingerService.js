@@ -268,9 +268,12 @@ importThings: function(toolbox)
 		var thing = items.firstChild;
 		while (thing)
 		{
-			LOG("Importing: "+thing.getAttribute("id"));
-			this.createToolbarItem(toolbox.palette, thing);
-			thing=thing.nextSibling;
+			if (thing.nodeType==things.ELEMENT_NODE)
+			{
+				LOG("Importing: "+thing.getAttribute("id"));
+				this.createToolbarItem(toolbox.palette, thing);
+				thing=thing.nextSibling;
+			}
 		}
 	}
 },

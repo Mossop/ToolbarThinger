@@ -2,6 +2,15 @@ toolbar .thinger-item[thingtype="bookmark"] {
   -moz-binding: url('chrome://thinger/content/bookmark/bookmark.xml#bookmark');
 }
 
+toolbar .thinger-item[thingtype="bookmarkToolbar"] {
+  -moz-binding: url('chrome://thinger/content/bookmark/toolbar.xml#toolbar');
+}
+
+.thinger-placesbar {
+  -moz-binding: url("chrome://browser/content/places/toolbar.xml#places-bar");
+  overflow: hidden;
+}
+
 toolbar .thinger-item[thingtype="script"] {
   -moz-binding: url('chrome://thinger/content/script/script.xml#script');
 }

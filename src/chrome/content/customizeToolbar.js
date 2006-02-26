@@ -60,6 +60,7 @@ var thinger = {
 		
 		// Create the custom items.
 		mypalette.firstChild.appendChild(thinger.createCustom("bookmark"));
+		mypalette.firstChild.appendChild(thinger.createCustom("bookmarkToolbar"));
 		mypalette.firstChild.appendChild(thinger.createCustom("script"));
 
 		var spacer = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul",

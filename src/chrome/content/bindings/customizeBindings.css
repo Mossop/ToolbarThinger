@@ -2,6 +2,10 @@
   -moz-binding: url('chrome://thinger/content/bookmark/bookmark.xml#bookmark');
 }
 
+.thinger-item[thingtype="bookmarkToolbar"] {
+  -moz-binding: url('chrome://thinger/content/bookmark/toolbar.xml#toolbar');
+}
+
 .thinger-item[thingtype="script"] {
   -moz-binding: url('chrome://thinger/content/script/script.xml#script');
 }
