@@ -55,7 +55,7 @@
       <constructor>
         this._service = Components.classes["@blueprintit.co.uk/thinger-service;1"]
                                   .getService(Components.interfaces.mIThingerService);
-        this._settings = service.getThingSettings(this);
+        this._settings = this._service.getThingSettings(this);
         
         while (this.firstChild)
           this.removeChild(this.firstChild);

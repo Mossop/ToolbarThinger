@@ -55,7 +55,8 @@
       <field name="_places">null</field>
       <field name="_result">null</field>
       <field name="_resultNode">null</field>
-      
+      <field name="_selection">null</field>
+        
       <method name="_init">
         <body>
           this._places = Components.classes["@mozilla.org/browser/nav-history-service;1"]
@@ -64,9 +65,12 @@
                                 .getService(Components.interfaces.nsINavBookmarksService);
 
           var query = this._places.getNewQuery();
+          var options = this._places.getNewQueryOptions();
+
           if (this._getAttribute("folder", "true")=="true")
           {
             query.setFolders([this._getAttribute("root", this._bms.toolbarRoot)], 1); 
+            options.setGroupingMode([Components.interfaces.nsINavHistoryQueryOptions.GROUP_BY_FOLDER], 1);
           }
           else
           {
@@ -76,11 +80,18 @@
             query.uri=uri;
           }
 
-          var options = this._places.getNewQueryOptions();
-          options.setGroupingMode([Components.interfaces.nsINavHistoryQueryOptions.GROUP_BY_FOLDER], 1);
           options.expandQueries = true;
           this._result = this._places.executeQuery(query, options);
           this._resultNode = this._result.root;
+          
+          if (!PlacesController.nodeIsFolder(this._resultNode))
+          {
+            this._resultNode.containerOpen = true;
+            var node = this._resultNode.getChild(0);
+            this._resultNode.containerOpen = false;
+            this._resultNode = node;
+          }
+          
           this._rebuild();
         </body>
       </method>
@@ -92,6 +103,12 @@
           
           this._button.setAttribute("label", this._resultNode.title);
           this._settings.setAttribute("label", this._resultNode.title);
+          if (this._resultNode.icon)
+          {
+            this._button.setAttribute("image", this._resultNode.icon.spec);
+            this._settings.setAttribute("image", this._resultNode.icon.spec);
+          }
+          
           if (PlacesController.nodeIsURI(this._resultNode))
           {
             this._button.setAttribute("url", this._resultNode.uri);
@@ -100,38 +117,137 @@
             if (this._button.firstChild)
               this._button.removeChild(this._button.firstChild);
           }
-          else if (PlacesController.nodeIsContainer(this._resultNode))
+          else if (PlacesController.nodeIsFolder(this._resultNode))
           {
             this._button.setAttribute("type", "menu");
             this._button.setAttribute("container", "true");
-            var popup = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "menupopup");
-            popup.setAttribute("type", "places");
-            // This is set here and not in the XBL constructor for the menu because
-            // it doesn't get initialized properly in the constructor.
-            popup.setAttribute("context", "placesContext");
-            this._button.appendChild(popup);
-            popup._result = this._result;
-            popup._resultNode = this._resultNode;
+            var popup = this._button.firstChild;
+            if (!this._button.firstChild)
+            {
+              popup = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "menupopup");
+              popup.setAttribute("type", "places");
+              popup.setAttribute("context", "placesContext");
+              this._button.appendChild(popup);
+            }
+            popup.setResultAndNode(this._result, this._resultNode);
           }
-          if (this._resultNode.icon)
-          {
-            this._button.setAttribute("image", this._resultNode.icon.spec);
-            this._settings.setAttribute("image", this._resultNode.icon.spec);
-          }
+
           this._button.node = this._resultNode;
           this._service.persistThings();
         </body>
       </method>
       
+      <method name="getResult">
+        <body>
+          return this._result;
+        </body>
+      </method>
+ 
+      <property name="isBookmarks">
+        <getter><![CDATA[ 
+          return PlacesController.nodeIsFolder(this.getResult());
+        ]]></getter>
+      </property>
+      
+      <property name="hasSelection">
+        <getter><![CDATA[ 
+          return this._selection != null;
+        ]]></getter>
+      </property>
+      
+      <property name="hasSingleSelection">
+        <getter><![CDATA[ 
+          return this.hasSelection;
+        ]]></getter>
+      </property>
+      
+      <method name="getSelectionNodes">
+        <body><![CDATA[
+          return this.hasSelection ? [this.selectedNode] : [];
+        ]]></body>
+      </method>
+      
+      <method name="getRemovableSelectionRanges">
+        <body><![CDATA[ 
+          return [this.getSelectionNodes()];
+        ]]></body>
+      </method>
+      
+      <method name="getCopyableSelection">
+        <body><![CDATA[
+          return this.getSelectionNodes();
+        ]]></body>
+      </method>
+      
+      <method name="getDragableSelection">
+        <body><![CDATA[
+          if (PlacesController.nodeIsReadOnly(this._resultNode))
+            return null;
+          return this.getSelectionNodes();
+        ]]></body>
+      </method>
+      
+      <property name="selectedNode">
+        <getter><![CDATA[ 
+          return this.hasSelection ? this._selection : null;
+        ]]></getter>
+      </property>
+      
+      <property name="selectedURINode">
+        <getter><![CDATA[
+          var node = this.selectedNode;
+          return node && PlacesController.nodeIsURI(node) ? node : null;
+        ]]></getter>
+      </property>
+      
+      <property name="browserWindow" onget="return window;"/>
+      
+      <property name="supportedDropTypes">
+        <getter>
+          if (PlacesController.nodeIsFolder(this._resultNode))
+            return [TYPE_X_MOZ_PLACE_CONTAINER, TYPE_X_MOZ_PLACE_SEPARATOR, TYPE_X_MOZ_PLACE, TYPE_X_MOZ_URL];
+          else
+            return [];
+        </getter>
+      </property>
+
+      <property name="supportedDropOnTypes">
+        <getter>
+          if (PlacesController.nodeIsFolder(this._resultNode))
+            return [TYPE_X_MOZ_PLACE_CONTAINER, TYPE_X_MOZ_PLACE_SEPARATOR, TYPE_X_MOZ_PLACE, TYPE_X_MOZ_URL];
+          else
+            return [];
+        </getter>
+      </property>
+
     </implementation>
     <handlers>
+      <handler event="command">
+        if (event.target != this)
+          return;
+        
+        this._selection = this._resultNode;
+        PlacesController.activeView = this;
+        PlacesController.mouseLoadURI(event);
+      </handler>
+
       <handler event="click">
-        if (event.button==2)
+        if ((event.button == 0) || (event.target != this))
+          return;
+
+        this._selection = this._resultNode;
+        PlacesController.activeView = this;
+        document.commandDispatcher.updateCommands("click");
+
+        if (event.button == 2)
         {
           this._configure("chrome://thinger/content/bookmark/options.xul");
           event.stopPropagation();
           event.preventDefault();
+          return;
         }
+          
+        PlacesController.mouseLoadURI(event);
       </handler>
     </handlers>
   </binding>
