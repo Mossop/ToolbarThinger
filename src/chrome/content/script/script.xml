@@ -64,11 +64,15 @@
         </body>
       </method>
       
+      <method name="customise">
+        <body>
+          this._configure("chrome://thinger/content/script/options.xul");
+        </body>
+      </method>
+      
       <method name="onCommand">
         <parameter name="event"/>
         <body>
-          this._configure("chrome://thinger/content/script/options.xul");
-          return;
           var doc = document;
           var win = window;
           if (false)

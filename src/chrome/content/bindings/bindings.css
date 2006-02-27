@@ -1,8 +1,8 @@
-toolbar .thinger-item[thingtype="bookmark"] {
+toolbar .thinger-item[thingtype="bookmark-item"] {
   -moz-binding: url('chrome://thinger/content/bookmark/bookmark.xml#bookmark');
 }
 
-toolbar .thinger-item[thingtype="bookmarkToolbar"] {
+toolbar .thinger-item[thingtype="bookmark-toolbar"] {
   -moz-binding: url('chrome://thinger/content/bookmark/toolbar.xml#toolbar');
 }
 
@@ -13,4 +13,8 @@ toolbar .thinger-item[thingtype="bookmarkToolbar"] {
 
 toolbar .thinger-item[thingtype="script"] {
   -moz-binding: url('chrome://thinger/content/script/script.xml#script');
+}
+
+.thinger-customise {
+  -moz-binding: url("chrome://thinger/content/bindings/thing.xml#customise");
 }

@@ -95,6 +95,12 @@
         </body>
       </method>
       
+      <method name="customise">
+        <body>
+        	this._configure("chrome://thinger/content/bookmark/options.xul");
+        </body>
+      </method>
+      
       <method name="_rebuild">
         <body>
           while (this.firstChild)
@@ -104,8 +110,14 @@
           this._settings.setAttribute("label", this._resultNode.title);
           if (this._resultNode.icon)
           {
+            dump("Setting icon to "+this._resultNode.icon.spec+"\n");
             this._button.setAttribute("image", this._resultNode.icon.spec);
             this._settings.setAttribute("image", this._resultNode.icon.spec);
+          }
+          else
+          {
+            this._button.removeAttribute("image");
+            this._settings.removeAttribute("image");
           }
           
           if (PlacesController.nodeIsURI(this._resultNode))
@@ -236,15 +248,8 @@
         PlacesController.activeView = this;
         document.commandDispatcher.updateCommands("click");
 
-        if (event.button == 2)
-        {
-          this._configure("chrome://thinger/content/bookmark/options.xul");
-          event.stopPropagation();
-          event.preventDefault();
-          return;
-        }
-          
-        PlacesController.mouseLoadURI(event);
+        if (event.button==1)
+          PlacesController.mouseLoadURI(event);
       </handler>
     </handlers>
   </binding>

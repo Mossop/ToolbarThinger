@@ -60,7 +60,10 @@
         while (this.firstChild)
           this.removeChild(this.firstChild);
           
-        this._startup();
+        if (this.customised)
+          this._init();
+        else
+          this.customise(true);
       </constructor>
       
       <destructor>
@@ -69,6 +72,11 @@
       
       <field name="_service">null</field>
       <field name="_settings">null</field>
+      <property name="customised">
+        <getter>
+          return this._getAttribute("customised", "false")=="true";
+        </getter>
+      </property>
       <property name="settings" onget="return this._settings"/>
       
       <method name="_getAttribute">
@@ -117,20 +125,6 @@
         </body>
       </method>
       
-      <method name="_startup">
-        <body>
-          if (this.parentNode.localName == "toolbar")
-            this._init();
-          else
-            this._designinit();
-        </body>
-      </method>
-      
-      <method name="_designinit">
-        <body>
-        </body>
-      </method>
-      
       <method name="_init">
         <body>
         </body>
@@ -141,9 +135,15 @@
         <body>
           var args = {
             settings: this._settings,
-            thing: this
+            thing: this,
+            force: !this.customised
           };
           window.openDialog(uri, "thingerconfig", "chrome,titlebar,toolbar,centerscreen,modal", args);
+        </body>
+      </method>
+      
+      <method name="customise">
+        <body>
         </body>
       </method>
       
@@ -151,7 +151,7 @@
         <body>
           dump("Rebuilding\n");
           this._destroy();
-          this._startup();
+          this._init();
         </body>
       </method>
 
@@ -166,9 +166,9 @@
   
   <binding id="button-thing" extends="chrome://thinger/content/bindings/thing.xml#thing">
     <implementation>
-      <field name="_button">document.getAnonymousNodes(this)[0]</field>
+      <property name="_button" onget="return document.getAnonymousNodes(this)[0]"/>
       
-      <method name="_designinit">
+      <method name="_init">
         <body>
           if (this._settings.hasAttribute("label"))
             this._button.setAttribute("label", this._settings.getAttribute("label"));
@@ -178,13 +178,28 @@
         </body>
       </method>
       
-      <method name="_init">
-        <body>
-          this._designinit();
-        </body>
-      </method>
+    </implementation>
+  </binding>
+
+  <binding id="customise"  display="xul:toolbaritem">
+    <content>
+      <xul:toolbarbutton tooltipText="Customise..."/>
+    </content>
+    
+    <implementation>
+    
+      <property name="thing">
+        <getter>
+          return this.previousSibling.firstChild;
+        </getter>
+      </property>
       
     </implementation>
+    <handlers>
+      <handler event="command">
+        this.thing.customise();
+      </handler>
+    </handlers>
   </binding>
 
 </bindings>

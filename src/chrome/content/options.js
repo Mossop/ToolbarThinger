@@ -45,10 +45,17 @@
 var settings = window.arguments[0].settings;
 var thing = window.arguments[0].thing;
 
+function setup()
+{
+	if (window.arguments[0].force)
+		document.documentElement.buttons="accept";
+}
+
 function persistSettings()
 {
 	var service = Components.classes["@blueprintit.co.uk/thinger-service;1"]
 	                        .getService(Components.interfaces.mIThingerService);
+	setAttribute("customised", "true");
 	service.persistThings();
 	thing.update();
 }
@@ -108,3 +115,5 @@ function setText(name, value)
 	
 	node.appendChild(node.ownerDocument.createTextNode(value));
 }
+
+window.addEventListener("load", setup, false);

@@ -7,3 +7,4 @@ overlay			chrome://global/content/customizeToolbar.xul				chrome://thinger/conte
 style       chrome://global/content/customizeToolbar.xul        chrome://thinger/content/bindings/customizeBindings.css
 
 overlay			chrome://browser/content/browser.xul								chrome://thinger/content/thinger.xul
+style       chrome://browser/content/browser.xul                chrome://thinger/skin/thinger.css

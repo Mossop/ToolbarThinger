@@ -51,7 +51,7 @@
     </content>
 
     <implementation>
-      <field name="_bookmarkBar">document.getAnonymousNodes(this)[0]</field>
+      <property name="_bookmarkBar" onget="return document.getAnonymousNodes(this)[0]"/>
     
       <method name="_init">
         <body>
@@ -59,7 +59,7 @@
                                                  .getService(Components.interfaces.nsINavHistoryService);
           this._bookmarkBar._bms = Components.classes["@mozilla.org/browser/nav-bookmarks-service;1"]
                                              .getService(Components.interfaces.nsINavBookmarksService);
-            
+          
           this._bookmarkBar._bms.addObserver(this._bookmarkBar._observer, false);
           var t = this._bookmarkBar;
           window.addEventListener("resize",
@@ -74,8 +74,27 @@
           this._bookmarkBar._result = this._bookmarkBar._places.executeQuery(query, options);
           this._bookmarkBar._result.root.containerOpen = true;
           this._bookmarkBar._rebuild();
+
+          this._settings.setAttribute("label", this._bookmarkBar._result.root.title);
+          if (this._bookmarkBar._result.root.icon)
+            this._settings.setAttribute("image", this._bookmarkBar._result.root.icon.spec);
+          else
+            this._settings.removeAttribute("image");
         </body>
       </method>
+
+      <method name="_destroy">
+        <body>
+          this._bookmarkBar._bms.removeObserver(this._bookmarkBar._observer);
+        </body>
+      </method>
+
+      <method name="customise">
+        <body>
+          this._configure("chrome://thinger/content/bookmark/options.xul");
+        </body>
+      </method>
+      
     </implementation>
   </binding>
 
