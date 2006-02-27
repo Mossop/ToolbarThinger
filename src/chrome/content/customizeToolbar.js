@@ -110,6 +110,16 @@ var thinger = {
 		oldOnAccept();
 	},
 	
+	addCustomiser: function(item)
+	{
+		if ("customise" in item.firstChild)
+		{
+	    var button = item.ownerDocument.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "toolbarbutton");
+	    button.setAttribute("class", "thinger-customise");
+	    item.parentNode.insertBefore(button, item.nextSibling);
+	  }
+	},
+	
 	setupCustomisation: function()
 	{
     for (var i = 0; i < gToolbox.childNodes.length; ++i)
@@ -122,11 +132,8 @@ var thinger = {
         {
         	var nextSibling = item.nextSibling;
           if (item.localName=="toolbarpaletteitem" && item.firstChild.hasAttribute("thingtype"))
-          {
-            var button = gToolbox.ownerDocument.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "toolbarbutton");
-            button.setAttribute("class", "thinger-customise");
-            toolbar.insertBefore(button, nextSibling);
-          }
+          	thinger.addCustomiser(item);
+
 	        item = nextSibling;
         }
       }
@@ -186,10 +193,7 @@ var thinger = {
 	{
 		if (event.target.localName=="toolbarpaletteitem" && event.target.firstChild.hasAttribute("thingtype"))
 		{
-			dump("Added: "+event.target.localName+"\n");
-	    var button = gToolbox.ownerDocument.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "toolbarbutton");
-	    button.setAttribute("class", "thinger-customise");
-	    event.target.parentNode.insertBefore(button, event.target.nextSibling);
+			thinger.addCustomiser(event.target);
 		}
 	},
 	
@@ -197,7 +201,6 @@ var thinger = {
 	{
 		if (event.target.localName=="toolbarpaletteitem" && event.target.firstChild.hasAttribute("thingtype"))
 		{
-			dump("Removed: "+event.target.localName+"\n");
 			if (event.target.nextSibling.localName=="toolbarbutton" && event.target.nextSibling.className=="thinger-customise")
 			{
 				event.target.parentNode.removeChild(event.target.nextSibling);

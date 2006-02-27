@@ -53,6 +53,7 @@
     <implementation>
       
       <constructor>
+      <![CDATA[
         this._service = Components.classes["@blueprintit.co.uk/thinger-service;1"]
                                   .getService(Components.interfaces.mIThingerService);
         this._settings = this._service.getThingSettings(this);
@@ -60,10 +61,11 @@
         while (this.firstChild)
           this.removeChild(this.firstChild);
           
-        if (this.customised)
-          this._init();
-        else
+        if ((!this.customised) && ("customise" in this))
           this.customise(true);
+        else
+          this._init();
+      ]]>
       </constructor>
       
       <destructor>
@@ -139,11 +141,6 @@
             force: !this.customised
           };
           window.openDialog(uri, "thingerconfig", "chrome,titlebar,toolbar,centerscreen,modal", args);
-        </body>
-      </method>
-      
-      <method name="customise">
-        <body>
         </body>
       </method>
       
