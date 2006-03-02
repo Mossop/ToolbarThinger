@@ -47,12 +47,15 @@
 
   <binding id="toolbar" extends="chrome://thinger/content/bindings/thing.xml#thing">
     <content>
-      <xul:hbox class="thinger-placesbar" flex="1" context="placesContext"/>
+      <xul:hbox class="thinger-placesbar" flex="1" context="placesContext">
+        <children/>
+      </xul:hbox>
     </content>
 
     <implementation>
       <property name="_bookmarkBar" onget="return document.getAnonymousNodes(this)[0]"/>
-    
+      <property name="_barLabel" onget="return document.getAnonymousNodes(this._bookmarkBar)[0].childNodes[1].childNodes[2]"/>
+      
       <method name="_init">
         <body>
           this._bookmarkBar._places = Components.classes["@mozilla.org/browser/nav-history-service;1"]
@@ -75,7 +78,8 @@
           this._bookmarkBar._result.root.containerOpen = true;
           this._bookmarkBar._rebuild();
 
-          this._settings.setAttribute("label", this._bookmarkBar._result.root.title);
+          this._settings.setAttribute("label", this._bookmarkBar._result.root.title+" Items");
+          this._barLabel.setAttribute("label", this._bookmarkBar._result.root.title+" Items");
           if (this._bookmarkBar._result.root.icon)
             this._settings.setAttribute("image", this._bookmarkBar._result.root.icon.spec);
           else
@@ -85,7 +89,13 @@
 
       <method name="_destroy">
         <body>
-          this._bookmarkBar._bms.removeObserver(this._bookmarkBar._observer);
+          try
+          {
+            this._bookmarkBar._bms.removeObserver(this._bookmarkBar._observer);
+          }
+          catch (e)
+          {
+          }
         </body>
       </method>
 

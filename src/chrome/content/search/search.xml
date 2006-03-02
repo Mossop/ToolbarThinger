@@ -45,56 +45,38 @@
 <bindings xmlns="http://www.mozilla.org/xbl"
           xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-  <binding id="script" extends="chrome://thinger/content/bindings/thing.xml#button-thing">
+  <binding id="search" extends="chrome://thinger/content/bindings/thing.xml#thing">
+    <content>
+      <xul:searchbar class="thinger-searchbar"/>
+    </content>
+
     <implementation>
-      <field name="_script">null</field>
-      
-      <method name="_init">
-        <body>
-        <![CDATA[
-          var text = "";
-          var code = this._getText("code", null);
-          if (code)
-            this._script = new Function("event", "document", "window", code);
-        ]]>
-        </body>
-      </method>
-      
-      <method name="customise">
-        <body>
-          this._configure("chrome://thinger/content/script/options.xul");
-        </body>
-      </method>
-      
-      <method name="onCommand">
-        <parameter name="event"/>
-        <body>
-          var doc = document;
-          var win = window;
-          if (false)
-          {
-            var browser = document.getElementById("content");
-            doc = browser.contentDocument;
-            win = browser.contentWindow;
-          }
-          
-          if (this._script)
-            this._script.call(this, event, doc, win);
-        </body>
-      </method>
     </implementation>
-
-    <handlers>
-      <handler event="command">
-        this.onCommand(event);
-      </handler>
-      
-      <handler event="click">
-        if (event.button==1)
-          this.onCommand(event);
-      </handler>
-    </handlers>
-
+  </binding>
+  
+  <binding id="searchbar" extends="chrome://browser/content/search/search.xml#searchbar">
+    <implementation>
+      <property name="currentEngine">
+        <getter>
+          if (this.parentNode._settings.hasAttribute("engine"))
+          {
+            var engine = this.searchService.getEngineByName(this.parentNode._settings.getAttribute("engine"));
+            if (engine)
+              return engine;
+          }
+          return this.searchService.currentEngine;
+        </getter>
+        
+        <setter>
+          if (val)
+            this.parentNode._settings.setAttribute("engine", val.name);
+          else
+            this.parentNode._settings.removeAttribute("engine");
+          this.parentNode._service.persistThings();
+          this.updateDisplay();
+        </setter>
+      </property>
+    </implementation>
   </binding>
 
 </bindings>

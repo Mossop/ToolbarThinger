@@ -48,7 +48,14 @@ var thinger = {
 
 	init: function(event)
 	{
-		oldOnLoad();
+		try
+		{
+			oldOnLoad();
+		}
+		catch (e)
+		{
+			// This may be a bad thing but carry on anyway
+		}
 		
 		thinger.setupCustomisation();
 		
@@ -67,6 +74,7 @@ var thinger = {
 		// Create the custom items.
 		mypalette.firstChild.appendChild(thinger.createCustom("bookmark-item"));
 		mypalette.firstChild.appendChild(thinger.createCustom("bookmark-toolbar"));
+		mypalette.firstChild.appendChild(thinger.createCustom("search"));
 		mypalette.firstChild.appendChild(thinger.createCustom("script"));
 
 		var spacer = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul",
@@ -112,12 +120,9 @@ var thinger = {
 	
 	addCustomiser: function(item)
 	{
-		if ("customise" in item.firstChild)
-		{
-	    var button = item.ownerDocument.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "toolbarbutton");
-	    button.setAttribute("class", "thinger-customise");
-	    item.parentNode.insertBefore(button, item.nextSibling);
-	  }
+    var button = item.ownerDocument.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "toolbarbutton");
+    button.setAttribute("class", "thinger-customise");
+    item.parentNode.insertBefore(button, item.nextSibling);
 	},
 	
 	setupCustomisation: function()
@@ -191,6 +196,7 @@ var thinger = {
 	
 	toolboxItemAdded: function(event)
 	{
+		dump("toolboxItemAdded: "+event.target.localName+"\n");
 		if (event.target.localName=="toolbarpaletteitem" && event.target.firstChild.hasAttribute("thingtype"))
 		{
 			thinger.addCustomiser(event.target);

@@ -47,7 +47,9 @@
 
   <binding id="bookmark" extends="chrome://thinger/content/bindings/thing.xml#button-thing">
     <content>
-      <xul:toolbarbutton label="New Bookmark Thinger" class="menuitem-iconic bookmark-item"/>
+      <xul:toolbarbutton label="New Bookmark Thinger" class="menuitem-iconic bookmark-item">
+        <children/>
+      </xul:toolbarbutton>
     </content>
 
     <implementation>

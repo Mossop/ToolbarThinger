@@ -218,10 +218,31 @@ createThing: function(toolbox, type)
 	}
 	
 	var uid = this.createUID();
-	var thing = things.createElementNS("http://users.blueprintit.co.uk/~dave/web/firefox/Thinger", "thing");
-	items.appendChild(thing);
+	var thing = null;
+	
+	var defs = this.things.getElementsByTagNameNS("http://users.blueprintit.co.uk/~dave/web/firefox/Thinger", "defaults");
+	if (defs.length==1)
+	{
+		var def = defs[0].firstChild;
+		while (def)
+		{
+			if ((def.nodeType==things.ELEMENT_NODE) && (def.getAttribute("type") == type))
+			{
+				thing = def.cloneNode(true);
+				break;
+			}
+			def = def.nextSibling;
+		}
+	}
+	
+	if (!thing)
+	{
+		thing = things.createElementNS("http://users.blueprintit.co.uk/~dave/web/firefox/Thinger", "thing");
+		thing.setAttribute("type", type);
+	}
+	
 	thing.setAttribute("id", uid);
-	thing.setAttribute("type", type);
+	items.appendChild(thing);
 	LOG("Added: "+uid);
 	
 	return this.createToolbarItem(toolbox.palette, thing);

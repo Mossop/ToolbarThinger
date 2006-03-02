@@ -7,8 +7,16 @@ toolbar .thinger-item[thingtype="bookmark-toolbar"] {
 }
 
 .thinger-placesbar {
-  -moz-binding: url("chrome://browser/content/places/toolbar.xml#places-bar");
+  -moz-binding: url('chrome://browser/content/places/toolbar.xml#places-bar');
   overflow: hidden;
+}
+
+toolbar .thinger-item[thingtype="search"] {
+  -moz-binding: url('chrome://thinger/content/search/search.xml#search');
+}
+
+.thinger-searchbar {
+  -moz-binding: url('chrome://thinger/content/search/search.xml#searchbar');
 }
 
 toolbar .thinger-item[thingtype="script"] {

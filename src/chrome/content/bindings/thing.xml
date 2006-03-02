@@ -47,7 +47,7 @@
 
   <binding id="thing" display="xul:toolbaritem">
     <content>
-      <xul:toolbarbutton label="New thinger"/>
+      <xul:toolbarbutton label="New Thinger"/>
     </content>
 
     <implementation>
@@ -179,22 +179,25 @@
   </binding>
 
   <binding id="customise"  display="xul:toolbaritem">
-    <content>
-      <xul:toolbarbutton tooltipText="Customise..."/>
+    <content hidden="true">
+      <xul:toolbarbutton hidden="true"/>
     </content>
     
     <implementation>
     
-      <property name="thing">
-        <getter>
-          return this.previousSibling.firstChild;
-        </getter>
-      </property>
+      <property name="button" onget="return document.getAnonymousNodes(this)[0]"/>
+      
+      <property name="thing" onget="return this.previousSibling.firstChild"/>
+      
+      <constructor>
+        this.button.hidden = !("customise" in this.thing);
+      </constructor>
       
     </implementation>
     <handlers>
       <handler event="command">
-        this.thing.customise();
+        if ("customise" in this.thing)
+          this.thing.customise();
       </handler>
     </handlers>
   </binding>
