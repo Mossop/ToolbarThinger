@@ -141,7 +141,11 @@
             thing: this,
             force: !this.customised
           };
-          window.openDialog(uri, "thingerconfig", "chrome,titlebar,toolbar,centerscreen,modal", args);
+          var features = "chrome,titlebar,toolbar,centerscreen,modal";
+          if (!this.customised)
+          	features+=",close=no";
+          	
+          window.openDialog(uri, "thingerconfig", features, args);
         </body>
       </method>
       

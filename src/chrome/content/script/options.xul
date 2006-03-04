@@ -48,6 +48,7 @@
         buttons="accept,cancel"
         ondialogaccept="onAccept()"
         onload="onLoad()"
+        style="width: 35em; height: 40em;"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   
   <script src="chrome://thinger/content/options.js"/>
@@ -58,6 +59,6 @@
     <textbox id="titlebox" flex="1"/>
   </hbox>
 
-  <textbox id="codebox" multiline="true" flex="1"/>
+  <textbox id="codebox" style="font-family: monospace" multiline="true" flex="1"/>
    
 </dialog>
