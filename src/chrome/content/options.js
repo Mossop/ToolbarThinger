@@ -79,7 +79,7 @@ function getText(name, def)
   
   if (name)
   {
-    node = node.getElementsByTagName(name);
+    node = node.getElementsByTagNameNS("http://users.blueprintit.co.uk/~dave/web/firefox/Thinger", name);
     if (!node || node.length==0)
       return def;
     node = node[0];
@@ -106,7 +106,7 @@ function setText(name, value)
 		node = node.getElementsByTagName(name);
 		if (!node || node.length==0)
 		{
-			node = settings.ownerDocument.createElement(name);
+			node = settings.ownerDocument.createElementNS("http://users.blueprintit.co.uk/~dave/web/firefox/Thinger", name);
 			settings.appendChild(node);
 		}
 		else

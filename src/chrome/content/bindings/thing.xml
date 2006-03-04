@@ -106,12 +106,13 @@
         <parameter name="def"/>
         <body>
           var node = this._settings;
-          
+  
           if (name)
           {
-            node = node.getElementsByTagName(name);
+            node = node.getElementsByTagNameNS("http://users.blueprintit.co.uk/~dave/web/firefox/Thinger", name);
             if (!node || node.length==0)
               return def;
+            node = node[0];
           }
           
           var result = "";
@@ -120,7 +121,7 @@
           {
             if (node.nodeType == Node.TEXT_NODE)
               result += node.nodeValue;
-
+        
             node = node.nextSibling;
           }
           return result;

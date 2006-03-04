@@ -80,6 +80,8 @@
           
           if (this._script)
             this._script.call(this, event, doc, win);
+          else
+            alert("Oops, no code to run");
         </body>
       </method>
     </implementation>
