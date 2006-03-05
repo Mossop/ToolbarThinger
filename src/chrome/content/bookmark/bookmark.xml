@@ -233,26 +233,47 @@
         </getter>
       </property>
 
+      <!-- Checks whether and event should be acted on by this menu
+           (It should be if the event affects one of this menu's child
+            nodes) -->
+      <method name="eventValid">
+        <parameter name="event"/>
+        <body><![CDATA[
+          if (event.target != this)
+            return false;
+          return true;
+        ]]></body>
+      </method>
+      
+      <!-- Sets the active view to this view, and sets the selection 
+           to the node from this event. -->
+      <method name="setSelectionForEvent">
+        <parameter name="event"/>
+        <body><![CDATA[
+          PlacesController.activeView = this;
+          document.commandDispatcher.updateCommands(event.type);
+        ]]></body>
+      </method>
+
     </implementation>
     <handlers>
-      <handler event="command">
-        if (event.target != this)
-          return;
-        
-        PlacesController.activeView = this;
-        PlacesController.mouseLoadURI(event);
-      </handler>
-
       <handler event="click">
-        if ((event.button == 0) || (event.target != this))
-          return;
-
-        PlacesController.activeView = this;
-        document.commandDispatcher.updateCommands("click");
-
-        if (event.button==1)
-          PlacesController.mouseLoadURI(event);
+        BookmarksEventHandler.onClick(event);
       </handler>
+      <handler event="command">
+        BookmarksEventHandler.onCommand(event);
+      </handler>
+      <handler event="popupshowing">
+        BookmarksEventHandler.onPopupShowing(event);
+      </handler>
+      <handler event="mousedown"><![CDATA[
+        if (this.eventValid(event))
+          this.setSelectionForEvent(event);
+      ]]></handler>
+      <handler event="DOMMenuItemActive"><![CDATA[
+        if (this.eventValid(event))
+          this.setSelectionForEvent(event);
+      ]]></handler>
     </handlers>
   </binding>
 

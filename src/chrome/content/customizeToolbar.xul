@@ -47,7 +47,7 @@
   <script type="application/x-javascript" src="customizeToolbar.js"/>
   
   <vbox id="main-box">
-    <vbox insertafter="palette-box" id="thinger-palette"
+    <vbox insertafter="palette-box" id="thinger-palette" hidden="true"
           ondraggesture="nsDragAndDrop.startDrag(event, dragStartObserver);"
           ondragover="nsDragAndDrop.dragOver(event, paletteDNDObserver);"
           ondragdrop="nsDragAndDrop.drop(event, paletteDNDObserver);">

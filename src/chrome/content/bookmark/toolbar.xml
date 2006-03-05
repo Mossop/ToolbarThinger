@@ -106,6 +106,17 @@
       </method>
       
     </implementation>
+    <handlers>
+      <handler event="click">
+        BookmarksEventHandler.onClick(event);
+      </handler>
+      <handler event="command">
+        BookmarksEventHandler.onCommand(event);
+      </handler>
+      <handler event="popupshowing">
+        BookmarksEventHandler.onPopupShowing(event);
+      </handler>
+    </handlers>
   </binding>
 
 </bindings>

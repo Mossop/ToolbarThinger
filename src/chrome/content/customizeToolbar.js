@@ -57,64 +57,70 @@ var thinger = {
 			// This may be a bad thing but carry on anyway
 		}
 		
-		thinger.setupCustomisation();
-		
-		thinger.service = Components.classes["@blueprintit.co.uk/thinger-service;1"].getService(Components.interfaces.mIThingerService);
-
-		// Listen for things being removed from the toolbar.
-		var palette = document.getElementById("palette-box");
-		palette.addEventListener("DOMNodeInserted", thinger.paletteItemAdded, false);
-		gToolbox.addEventListener("DOMNodeRemoved", thinger.toolboxItemRemoved, false);
-		
-		// Listen for things being dropped onto the toolbar
-		var mypalette = document.getElementById("thinger-palette");
-		mypalette.addEventListener("DOMNodeRemoved", thinger.paletteItemRemoved, false);
-		gToolbox.addEventListener("DOMNodeInserted", thinger.toolboxItemAdded, false);
-		
-		// Create the custom items.
-		mypalette.firstChild.appendChild(thinger.createCustom("bookmark-item"));
-		mypalette.firstChild.appendChild(thinger.createCustom("bookmark-toolbar"));
-		mypalette.firstChild.appendChild(thinger.createCustom("search"));
-		mypalette.firstChild.appendChild(thinger.createCustom("script"));
-
-		var spacer = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul",
-		                                      "spacer");
-		spacer.setAttribute("flex", "0");
-		mypalette.firstChild.appendChild(spacer);
+		if (gToolboxDocument.defaultView.thinger)
+		{
+			thinger.setupCustomisation();
+			
+			thinger.service = Components.classes["@blueprintit.co.uk/thinger-service;1"].getService(Components.interfaces.mIThingerService);
+	
+			// Listen for things being removed from the toolbar.
+			var palette = document.getElementById("palette-box");
+			palette.addEventListener("DOMNodeInserted", thinger.paletteItemAdded, false);
+			gToolbox.addEventListener("DOMNodeRemoved", thinger.toolboxItemRemoved, false);
+			
+			// Listen for things being dropped onto the toolbar
+			var mypalette = document.getElementById("thinger-palette");
+			mypalette.hidden = false;
+			mypalette.addEventListener("DOMNodeRemoved", thinger.paletteItemRemoved, false);
+			gToolbox.addEventListener("DOMNodeInserted", thinger.toolboxItemAdded, false);
+			
+			// Create the custom items.
+			mypalette.firstChild.appendChild(thinger.createCustom("bookmark-item"));
+			mypalette.firstChild.appendChild(thinger.createCustom("bookmark-toolbar"));
+			mypalette.firstChild.appendChild(thinger.createCustom("search"));
+			mypalette.firstChild.appendChild(thinger.createCustom("script"));
+	
+			var spacer = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul",
+			                                      "spacer");
+			spacer.setAttribute("flex", "0");
+			mypalette.firstChild.appendChild(spacer);
+		}
 	},
 	
 	accept: function(event)
 	{
-		// Listen for things being removed from the toolbar.
-		var palette = document.getElementById("palette-box");
-		palette.removeEventListener("DOMNodeInserted", thinger.paletteItemAdded, false);
-		gToolbox.removeEventListener("DOMNodeRemoved", thinger.toolboxItemRemoved, false);
-		
-		// Listen for things being dropped onto the toolbar
-		var mypalette = document.getElementById("thinger-palette");
-		mypalette.removeEventListener("DOMNodeRemoved", thinger.paletteItemRemoved, false);
-		gToolbox.removeEventListener("DOMNodeInserted", thinger.toolboxItemAdded, false);
-
-		thinger.removeCustomisation();
-
-		// Wipe the custom thing.
-		var mypalette = document.getElementById("thinger-palette");
-		var row = mypalette.firstChild;
-		while (row)
+		if (gToolboxDocument.defaultView.thinger)
 		{
-			var wrapper = row.firstChild;
-			while (wrapper)
+			// Listen for things being removed from the toolbar.
+			var palette = document.getElementById("palette-box");
+			palette.removeEventListener("DOMNodeInserted", thinger.paletteItemAdded, false);
+			gToolbox.removeEventListener("DOMNodeRemoved", thinger.toolboxItemRemoved, false);
+			
+			// Listen for things being dropped onto the toolbar
+			var mypalette = document.getElementById("thinger-palette");
+			mypalette.removeEventListener("DOMNodeRemoved", thinger.paletteItemRemoved, false);
+			gToolbox.removeEventListener("DOMNodeInserted", thinger.toolboxItemAdded, false);
+	
+			thinger.removeCustomisation();
+	
+			// Wipe the custom thing.
+			var mypalette = document.getElementById("thinger-palette");
+			var row = mypalette.firstChild;
+			while (row)
 			{
-				if (wrapper.id.substring(0,16)=="wrapper-thinger-")
-					thinger.deleteItem(wrapper);
-				wrapper=wrapper.nextSibling;
+				var wrapper = row.firstChild;
+				while (wrapper)
+				{
+					if (wrapper.id.substring(0,16)=="wrapper-thinger-")
+						thinger.deleteItem(wrapper);
+					wrapper=wrapper.nextSibling;
+				}
+				row=row.nextSibling;
 			}
-			row=row.nextSibling;
+					
+			// Persist the thing cache.
+			thinger.service.persistThings();
 		}
-				
-		// Persist the thing cache.
-		thinger.service.persistThings();
-		
 		oldOnAccept();
 	},
 	
