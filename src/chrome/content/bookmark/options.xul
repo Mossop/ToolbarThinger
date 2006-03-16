@@ -51,6 +51,7 @@
         onload="onLoad()" style="width: 400px; height: 500px;"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   
+  <script src="chrome://global/content/debug.js"/>
   <script src="chrome://browser/content/places/controller.js"/>
   <script src="chrome://thinger/content/options.js"/>
   <script src="options.js"/>

@@ -65,24 +65,28 @@
           this._bms = Components.classes["@mozilla.org/browser/nav-bookmarks-service;1"]
                                 .getService(Components.interfaces.nsINavBookmarksService);
 
-          var query = this._places.getNewQuery();
-          var options = this._places.getNewQueryOptions();
-
-          if (this._getAttribute("folder", "true")=="true")
+          var queryString = this._getAttribute("root", "");
+ 
+          if (queryString.substring(0,6)=="place:")
           {
-            query.setFolders([this._getAttribute("root", this._bms.toolbarRoot)], 1); 
-            options.setGroupingMode([Components.interfaces.nsINavHistoryQueryOptions.GROUP_BY_FOLDER], 1);
+            var queries = { }, options = { };
+            this._places.queryStringToQueries(queryString, queries, { }, options);
+            if (!queries.value.length) 
+              queries.value = [this._places.getNewQuery()];
+            this._result = this._places.executeQueries(queries.value, queries.value.length, options.value);
           }
           else
           {
+            var query = this._places.getNewQuery();
+            var options = this._places.getNewQueryOptions();
             var uri = Components.classes["@mozilla.org/network/simple-uri;1"]
                                 .createInstance(Components.interfaces.nsIURI);
-            uri.spec = this._getAttribute("root","");
+            uri.spec = queryString;
             query.uri=uri;
+            options.expandQueries = true;
+            this._result = this._places.executeQuery(query, options);
           }
 
-          options.expandQueries = true;
-          this._result = this._places.executeQuery(query, options);
           this._resultNode = this._result.root;
           
           if (!PlacesController.nodeIsFolder(this._resultNode))
@@ -140,9 +144,14 @@
               popup = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "menupopup");
               popup.setAttribute("type", "places");
               popup.setAttribute("context", "placesContext");
+	            popup.setAttribute("place", this._resultNode.uri);
               this._button.appendChild(popup);
             }
-            popup.setResultAndNode(this._result, this._resultNode);
+            else
+            {
+	            popup.setAttribute("place", this._resultNode.uri);
+	            popup.init();
+	          }
           }
 
           this._button.node = this._resultNode;

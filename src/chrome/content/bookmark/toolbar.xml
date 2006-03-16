@@ -47,7 +47,7 @@
 
   <binding id="toolbar" extends="chrome://thinger/content/bindings/thing.xml#thing">
     <content>
-      <xul:hbox class="thinger-placesbar" flex="1" context="placesContext">
+      <xul:hbox class="thinger-placesbar" flex="1" asyncinit="true" context="placesContext">
         <children/>
       </xul:hbox>
     </content>
@@ -58,25 +58,9 @@
       
       <method name="_init">
         <body>
-          this._bookmarkBar._places = Components.classes["@mozilla.org/browser/nav-history-service;1"]
-                                                 .getService(Components.interfaces.nsINavHistoryService);
-          this._bookmarkBar._bms = Components.classes["@mozilla.org/browser/nav-bookmarks-service;1"]
-                                             .getService(Components.interfaces.nsINavBookmarksService);
-          
-          this._bookmarkBar._bms.addObserver(this._bookmarkBar._observer, false);
-          var t = this._bookmarkBar;
-          window.addEventListener("resize",
-                                  function f(e) { t.updateChevron(e); },
-                                  false);
-  
-          var query = this._bookmarkBar._places.getNewQuery();
-          query.setFolders([this._getAttribute("root", this._bookmarkBar._bms.toolbarRoot)], 1);
-          var options = this._bookmarkBar._places.getNewQueryOptions();
-          options.setGroupingMode([Components.interfaces.nsINavHistoryQueryOptions.GROUP_BY_FOLDER], 1);
-          options.expandQueries = true;
-          this._bookmarkBar._result = this._bookmarkBar._places.executeQuery(query, options);
-          this._bookmarkBar._result.root.containerOpen = true;
-          this._bookmarkBar._rebuild();
+        <![CDATA[
+          this._bookmarkBar.setAttribute("place", this._getAttribute("root", "place:&folder=3&group=3&expandQueries=1"));
+          this._bookmarkBar.init();
 
           this._settings.setAttribute("label", this._bookmarkBar._result.root.title+" Items");
           this._barLabel.setAttribute("label", this._bookmarkBar._result.root.title+" Items");
@@ -84,6 +68,7 @@
             this._settings.setAttribute("image", this._bookmarkBar._result.root.icon.spec);
           else
             this._settings.removeAttribute("image");
+        ]]>
         </body>
       </method>
 

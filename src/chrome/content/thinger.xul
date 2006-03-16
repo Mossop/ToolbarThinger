@@ -43,6 +43,7 @@
    -->
 
 <?xml-stylesheet href="chrome://thinger/content/bindings/bindings.css" type="text/css"?>
+<?xml-stylesheet href="chrome://thinger/skin/thinger.css" type="text/css"?>
 
 <overlay id="ThingerOverlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 

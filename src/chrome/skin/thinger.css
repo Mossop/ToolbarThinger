@@ -1,3 +1,16 @@
 .thinger-customise {
   list-style-image: url('chrome://thinger/skin/options.png');
 }
+
+.thinger-item[thingtype="bookmark-item"] {
+}
+
+.thinger-item[thingtype="bookmark-toolbar"] {
+}
+
+.thinger-item[thingtype="search"] {
+  list-style-image: url('chrome://thinger/skin/search.png');
+}
+
+toolbar .thinger-item[thingtype="script"] {
+}

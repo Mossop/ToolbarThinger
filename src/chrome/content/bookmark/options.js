@@ -68,15 +68,6 @@ function onLoad()
 function onAccept()
 {
 	var node = tree.selectedNode;
-	if (PlacesController.nodeIsURI(node))
-	{
-		setAttribute("root", node.uri);
-		setAttribute("folder", "false");
-	}
-	else if (PlacesController.nodeIsFolder(node))
-	{
-		setAttribute("root", asFolder(node).folderId);
-		setAttribute("folder", "true");
-	}
+	setAttribute("root", node.uri);
 	persistSettings();
 }
