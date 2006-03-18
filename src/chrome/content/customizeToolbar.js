@@ -70,7 +70,7 @@ var thinger = {
 			
 			// Listen for things being dropped onto the toolbar
 			var mypalette = document.getElementById("thinger-palette");
-			mypalette.hidden = false;
+			mypalette.parentNode.hidden = false;
 			mypalette.addEventListener("DOMNodeRemoved", thinger.paletteItemRemoved, false);
 			gToolbox.addEventListener("DOMNodeInserted", thinger.toolboxItemAdded, false);
 			
