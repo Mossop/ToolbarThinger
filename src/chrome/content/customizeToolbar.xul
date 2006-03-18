@@ -47,6 +47,7 @@
 
 <overlay id="ThingerOverlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
+  <script type="application/x-javascript" src="chrome://global/content/debug.js"/>
   <script type="application/x-javascript" src="customizeToolbar.js"/>
   
   <vbox id="main-box">

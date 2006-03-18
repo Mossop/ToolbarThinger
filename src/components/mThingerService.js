@@ -264,24 +264,19 @@ createThing: function(toolbox, type)
 getThingSettings: function(item)
 {
 	var id = item.getAttribute("id").substring(8);
+	LOG("Looking for settings of "+id);
 	return this.things.getElementById(id);
 },
 
 getThingDefaults: function(item)
 {
-	try
-	{
-		var id = item.getAttribute("id").substring(8);
-		var thing = this.things.getElementById(id);
-		var type = thing.getAttribute("type");
-		var defaults = this.defaults.getElementsByAttribute("type", type);
-		if (defaults && defaults.length>0)
-			return defaults[0];
-	}
-	catch (e)
-	{
-		LOG(e);
-	}
+	var id = item.getAttribute("id").substring(8);
+	LOG("Looking for defaults of "+id);
+	var thing = this.things.getElementById(id);
+	var type = thing.getAttribute("type");
+	var defaults = this.defaults.getElementsByAttribute("type", type);
+	if (defaults && defaults.length>0)
+		return defaults[0];
 	return null;
 },
 

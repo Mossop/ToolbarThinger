@@ -53,7 +53,6 @@
     </content>
 
     <implementation>
-      <field name="_bms">null</field>
       <field name="_places">null</field>
       <field name="_result">null</field>
       <field name="_resultNode">null</field>
@@ -62,8 +61,6 @@
         <body>
           this._places = Components.classes["@mozilla.org/browser/nav-history-service;1"]
                                    .getService(Components.interfaces.nsINavHistoryService);
-          this._bms = Components.classes["@mozilla.org/browser/nav-bookmarks-service;1"]
-                                .getService(Components.interfaces.nsINavBookmarksService);
 
           var queryString = this._getAttribute("root");
  
@@ -144,6 +141,7 @@
               popup = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "menupopup");
               popup.setAttribute("type", "places");
               popup.setAttribute("context", "placesContext");
+              popup.setAttribute("asyncinit", "true");
 	            popup.setAttribute("place", this._resultNode.uri);
               this._button.appendChild(popup);
             }

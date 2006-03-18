@@ -54,18 +54,27 @@
       
       <constructor>
       <![CDATA[
-        this._service = Components.classes["@blueprintit.co.uk/thinger-service;1"]
-                                  .getService(Components.interfaces.mIThingerService);
-        this._settings = this._service.getThingSettings(this);
-        this._defaults = this._service.getThingDefaults(this);
-        
-        while (this.firstChild)
-          this.removeChild(this.firstChild);
+        try
+        {
+          this._service = Components.classes["@blueprintit.co.uk/thinger-service;1"]
+                                    .getService(Components.interfaces.mIThingerService);
+          this._settings = this._service.getThingSettings(this);
+          this._defaults = this._service.getThingDefaults(this);
           
-        if ((!this.customised) && ("customise" in this))
-          this.customise(true);
-        else
-          this._init();
+          NS_ASSERT(this._settings && this._defaults, "Service returned bogus settings");
+          
+          while (this.firstChild)
+            this.removeChild(this.firstChild);
+            
+          if ((!this.customised) && ("customise" in this))
+            this.customise();
+          else
+            this._init();
+        }
+        catch (e) // Absolutely must not throw from here or the customisation routines are screwed.
+        {
+          dump("Failed during thing constructor: "+e+"\n");
+        }
       ]]>
       </constructor>
       
@@ -86,6 +95,8 @@
       <method name="_hasAttribute">
         <parameter name="name"/>
         <body>
+          NS_ASSERT(this._settings, "Thing not properly initialised");
+          
           if (this._settings.hasAttribute(name))
             return true;
             
@@ -100,6 +111,8 @@
         <parameter name="name"/>
         <parameter name="def"/>
         <body>
+          NS_ASSERT(this._settings, "Thing not properly initialised");
+          
           if (this._settings.hasAttribute(name))
             return this._settings.getAttribute(name);
             
@@ -114,6 +127,8 @@
         <parameter name="name"/>
         <parameter name="value"/>
         <body>
+          NS_ASSERT(this._settings, "Thing not properly initialised");
+          
           return this._settings.setAttribute(name, value);
           this._service.persistThings();
         </body>
@@ -123,6 +138,8 @@
         <parameter name="name"/>
         <parameter name="def"/>
         <body>
+          NS_ASSERT(this._settings, "Thing not properly initialised");
+          
           var node = this._settings;
   
           if (name)
@@ -170,6 +187,8 @@
       
       <method name="update">
         <body>
+          NS_ASSERT(this._settings, "Thing not properly initialised");
+          
           dump("Rebuilding\n");
           this._destroy();
           this._init();

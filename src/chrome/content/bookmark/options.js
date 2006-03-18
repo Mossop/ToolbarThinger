@@ -52,17 +52,14 @@ function onLoad()
 {
 	tree = document.getElementById("placeContent");  
 	tree.controllers.appendController(PlacesController);
-	tree.init(new ViewConfig(ViewConfig.GENERIC_DROP_TYPES,
-													 ViewConfig.GENERIC_DROP_TYPES,
-													 false, false, 0, true));
-
   var query = places.getNewQuery();
   query.setFolders([bms.placesRoot], 1);
   query.onlyBookmarked=true;
   var options = places.getNewQueryOptions();
   options.setGroupingMode([Components.interfaces.nsINavHistoryQueryOptions.GROUP_BY_FOLDER], 1);
   options.expandQueries = true;
-	tree.load([query], options);
+	tree._load([query], options);
+	tree.selectPlaceURI(getAttribute("root"));
 }
 
 function onAccept()
