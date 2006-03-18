@@ -42,10 +42,12 @@
    - $Revision$
    -->
 
+<!DOCTYPE dialog SYSTEM "chrome://thinger/locale/bookmark.dtd">
+
 <?xml-stylesheet href="chrome://global/skin" type="text/css"?>
 <?xml-stylesheet href="chrome://browser/content/places/places.css"?>
 
-<dialog title="Bookmark Options"
+<dialog title="&thinger.bookmark.options.title;"
         buttons="accept,cancel"
         ondialogaccept="onAccept()"
         onload="onLoad()" style="width: 400px; height: 500px;"
@@ -58,7 +60,7 @@
   
   <tree id="placeContent" flex="1" query="" type="places">
     <treecols>
-      <treecol label="Label" id="title" flex="5" primary="true"/>
+      <treecol id="title" flex="5" primary="true"/>
     </treecols>
     <treechildren view="placeContent" flex="1"/>
   </tree>

@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 
-<!DOCTYPE thinger SYSTEM "chrome://thinger/content/thinger.dtd">
+<!DOCTYPE thinger SYSTEM "chrome://thinger/locale/defaults.dtd">
 
 <defaults xmlns="http://users.blueprintit.co.uk/~dave/web/firefox/Thinger" version="1">
-  <thing type="bookmark-item" root="place:&amp;folder=2&amp;group=3&amp;expandQueries=1" label="New Bookmark"/>
-  <thing type="bookmark-toolbar" root="place:&amp;folder=3&amp;group=3&amp;expandQueries=1" label="New Bookmark Toolbar"/>
-  <thing type="search" label="New Search Bar"/>
-  <thing type="script" label="New Script"/>
+  <thing type="bookmark-item" root="place:&amp;folder=2&amp;group=3&amp;expandQueries=1" label="&thinger.bookmark-item.label;"/>
+  <thing type="bookmark-toolbar" root="place:&amp;folder=3&amp;group=3&amp;expandQueries=1" label="&thinger.bookmark-toolbar.label;"/>
+  <thing type="search" label="&thinger.search.label;"/>
+  <thing type="script" label="&thinger.script.label;"/>
 </defaults>

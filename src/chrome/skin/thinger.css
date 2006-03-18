@@ -3,6 +3,7 @@
 }
 
 .thinger-item[thingtype="bookmark-item"] {
+  list-style-image: url('chrome://thinger/skin/bookmark.png');
 }
 
 .thinger-item[thingtype="bookmark-toolbar"] {

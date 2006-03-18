@@ -225,7 +225,17 @@ var thinger = {
 		if (event.target.id.substring(0,16)=="wrapper-thinger-")
 		{
 			// Someone dropped a custom item
-			if (confirm("Delete?"))
+		 	var sbs = Components.classes["@mozilla.org/intl/stringbundle;1"]
+											.getService(Components.interfaces.nsIStringBundleService);
+			var bundle = sbs.createBundle("chrome://thinger/locale/customise.properties");
+			var promptService = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
+		                    .getService(Components.interfaces.nsIPromptService);
+		  var text = bundle.GetStringFromName("thinger.deleteprompt.description");
+		  var keeptext = bundle.GetStringFromName("thinger.keep.label");
+		  var deletetext = bundle.GetStringFromName("thinger.delete.label");
+		  var result = promptService.confirmEx(window, "Toolbar Thinger", text, 32639+16777216, keeptext, deletetext, null, null, { value: false });
+		  
+			if (result==1)
 			{
 				thinger.deleteItem(event.target);
 				

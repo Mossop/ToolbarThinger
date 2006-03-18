@@ -42,9 +42,11 @@
    - $Revision$
    -->
 
+<!DOCTYPE dialog SYSTEM "chrome://thinger/locale/script.dtd">
+
 <?xml-stylesheet href="chrome://global/skin" type="text/css"?>
 
-<dialog title="Script Options"
+<dialog title="&thinger.script.options.title;"
         buttons="accept,cancel"
         ondialogaccept="onAccept()"
         onload="onLoad()"
@@ -55,7 +57,7 @@
   <script src="options.js"/>
   
   <hbox>
-    <label control="titlebox" value="Title:"/>
+    <label control="titlebox" value="&thinger.script.options.title.label;"/>
     <textbox id="titlebox" flex="1"/>
   </hbox>
 
