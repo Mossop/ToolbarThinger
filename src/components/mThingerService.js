@@ -50,6 +50,7 @@ function LOG(text)
 var mThingerService = {
 
 thingCache: null,
+defaultThings: null,
 namespace: "http://users.blueprintit.co.uk/~dave/web/firefox/Thinger",
 
 xmldochelper: {
@@ -58,7 +59,7 @@ xmldochelper: {
 	{
 		var self = this;
 		document.getElementById = function(id) { return self.getElementById(document, id); }
-		document.getElementsByAttribute = function(name, value) { return self.getElementsByAttribute(document, id); }
+		document.getElementsByAttribute = function(name, value) { return self.getElementsByAttribute(document, name, value); }
  	},
 
 	// Generic way to brute force search the document for attributes with a set value.
@@ -108,44 +109,65 @@ xmldochelper: {
 	}
 },
 
-loadFromFile: function(datafile)
+loadXMLFromURI: function(uri)
 {
 	var cache = null;
 	var parser = Components.classes["@mozilla.org/xmlextras/domparser;1"]
 	                       .createInstance(Components.interfaces.nsIDOMParser);
+	var ios = Components.classes["@mozilla.org/network/io-service;1"]
+	                    .getService(Components.interfaces.nsIIOService);
+		
 	try
 	{
-		var stream = Components.classes["@mozilla.org/network/file-input-stream;1"]
-		                       .createInstance(Components.interfaces.nsIFileInputStream);
-		stream.init(datafile, 1, 0, Components.interfaces.nsIFileInputStream.CLOSE_ON_EOF);
-		
-		//cache = parser.parseFromString('<?xml version="1.0"?> <!DOCTYPE thinger SYSTEM "chrome://thinger/content/thinger.dtd"> <thinger xmlns="http://users.blueprintit.co.uk/~dave/web/firefox/Thinger" version="1"></thinger>', "text/xml");
-		cache = parser.parseFromStream(stream, "UTF8", datafile.fileSize, "text/xml");
+		if (typeof uri == "string")
+		{
+			var rluri = Components.classes["@mozilla.org/network/standard-url;1"]
+			                      .createInstance(Components.interfaces.nsIURI);
+			rluri.spec = uri;
+			uri = rluri;
+		}
+		var channel = ios.newChannelFromURI(uri);
+		var stream = channel.open();
+		cache = parser.parseFromStream(stream, "UTF8", channel.contentLength, "text/xml");
 		stream.close();
+
+		if (cache)
+			this.xmldochelper.install(cache);
+	
+		return cache;
 	}
 	catch (e)
 	{
 		LOG(e+"\n");
-		return false;
+		return null;
 	}
+},
 
-	if (!cache)
-		return false;
+loadXML: function(sources, expected)
+{
+	for (var i=0; i<sources.length; i++)
+	{
+		var xml = this.loadXMLFromURI(sources[i]);
 
-	if (!cache.documentElement)
-		return false;
-	
-	if (cache.documentElement.localName!="thinger")
-		return false;
+		if (!xml)
+			continue;
+
+		if (!xml.documentElement)
+			continue;
 		
-	if (cache.documentElement.namespaceURI!=this.namespace)
-		return false;
+		if (xml.documentElement.localName!=expected)
+			continue;
+			
+		if (xml.documentElement.namespaceURI!=this.namespace)
+			continue;
+	
+		return xml;
+	}
+},
 
-	this.xmldochelper.install(cache);
-	
-	this.thingCache = cache;
-	
-	return true;
+loadDefaults: function()
+{
+	this.defaultThings = this.loadXML(["chrome://thinger/content/defaults/defaults.xml"], "defaults");
 },
 
 loadThings: function()
@@ -155,22 +177,28 @@ loadThings: function()
 	var directoryService = Components.classes["@mozilla.org/file/directory_service;1"]
 										               .getService(Components.interfaces.nsIProperties);
 	
+	var sources = [];
 	var datafile = directoryService.get("ProfD",Components.interfaces.nsIFile);
 	datafile.append("thinger.xml");
 	if (datafile.exists())
 	{
-		this.loadFromFile(datafile);
+		var ios = Components.classes["@mozilla.org/network/io-service;1"]
+		                    .getService(Components.interfaces.nsIIOService);
+		
+		var fileuri = ios.newFileURI(datafile);
+		sources.push(fileuri);
 	}
 	
-	if (!this.thingCache)
-	{
-		var em = Components.classes["@mozilla.org/extensions/manager;1"]
-							         .getService(Components.interfaces.nsIExtensionManager);
-		var installLocation = em.getInstallLocation("Thinger@blueprintit.co.uk");
-		datafile = installLocation.getItemFile("Thinger@blueprintit.co.uk", "defaults/thinger.xml");
-		
-		this.loadFromFile(datafile);
-	}
+	sources.push("chrome://thinger/content/defaults/thinger.xml");
+
+	this.thingCache = this.loadXML(sources, "thinger");
+},
+
+get defaults()
+{
+	if (this.defaultThings==null)
+		this.loadDefaults();
+	return this.defaultThings;
 },
 
 get things()
@@ -220,21 +248,6 @@ createThing: function(toolbox, type)
 	var uid = this.createUID();
 	var thing = null;
 	
-	var defs = this.things.getElementsByTagNameNS("http://users.blueprintit.co.uk/~dave/web/firefox/Thinger", "defaults");
-	if (defs.length==1)
-	{
-		var def = defs[0].firstChild;
-		while (def)
-		{
-			if ((def.nodeType==things.ELEMENT_NODE) && (def.getAttribute("type") == type))
-			{
-				thing = def.cloneNode(true);
-				break;
-			}
-			def = def.nextSibling;
-		}
-	}
-	
 	if (!thing)
 	{
 		thing = things.createElementNS("http://users.blueprintit.co.uk/~dave/web/firefox/Thinger", "thing");
@@ -252,6 +265,24 @@ getThingSettings: function(item)
 {
 	var id = item.getAttribute("id").substring(8);
 	return this.things.getElementById(id);
+},
+
+getThingDefaults: function(item)
+{
+	try
+	{
+		var id = item.getAttribute("id").substring(8);
+		var thing = this.things.getElementById(id);
+		var type = thing.getAttribute("type");
+		var defaults = this.defaults.getElementsByAttribute("type", type);
+		if (defaults && defaults.length>0)
+			return defaults[0];
+	}
+	catch (e)
+	{
+		LOG(e);
+	}
+	return null;
 },
 
 deleteThing: function(item)

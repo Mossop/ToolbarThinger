@@ -57,6 +57,7 @@
         this._service = Components.classes["@blueprintit.co.uk/thinger-service;1"]
                                   .getService(Components.interfaces.mIThingerService);
         this._settings = this._service.getThingSettings(this);
+        this._defaults = this._service.getThingDefaults(this);
         
         while (this.firstChild)
           this.removeChild(this.firstChild);
@@ -74,6 +75,7 @@
       
       <field name="_service">null</field>
       <field name="_settings">null</field>
+      <field name="_defaults">null</field>
       <property name="customised">
         <getter>
           return this._getAttribute("customised", "false")=="true";
@@ -81,14 +83,30 @@
       </property>
       <property name="settings" onget="return this._settings"/>
       
+      <method name="_hasAttribute">
+        <parameter name="name"/>
+        <body>
+          if (this._settings.hasAttribute(name))
+            return true;
+            
+          if (this._defaults.hasAttribute(name))
+            return true;
+            
+          return false;
+        </body>
+      </method>
+      
       <method name="_getAttribute">
         <parameter name="name"/>
         <parameter name="def"/>
         <body>
-          if (!this._settings.hasAttribute(name))
-            return def;
+          if (this._settings.hasAttribute(name))
+            return this._settings.getAttribute(name);
             
-          return this._settings.getAttribute(name);
+          if (this._defaults.hasAttribute(name))
+            return this._defaults.getAttribute(name);
+            
+          return def;
         </body>
       </method>
       
@@ -138,6 +156,7 @@
         <body>
           var args = {
             settings: this._settings,
+            defaults: this._defaults,
             thing: this,
             force: !this.customised
           };
@@ -172,11 +191,11 @@
       
       <method name="_init">
         <body>
-          if (this._settings.hasAttribute("label"))
-            this._button.setAttribute("label", this._settings.getAttribute("label"));
+          if (this._hasAttribute("label"))
+            this._button.setAttribute("label", this._getAttribute("label"));
 
-          if (this._settings.hasAttribute("image"))
-            this._button.setAttribute("image", this._settings.getAttribute("image"));
+          if (this._hasAttribute("image"))
+            this._button.setAttribute("image", this._getAttribute("image"));
         </body>
       </method>
       

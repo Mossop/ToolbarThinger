@@ -45,6 +45,14 @@
 <bindings xmlns="http://www.mozilla.org/xbl"
           xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
+  <binding id="places-bar" extends="chrome://browser/content/places/toolbar.xml#places-bar">
+    <implementation>
+      <constructor>
+        // Don't do anything silly like trying to initialise before I want you to.
+      </constructor>
+    </implementation>
+  </binding>
+  
   <binding id="toolbar" extends="chrome://thinger/content/bindings/thing.xml#thing">
     <content>
       <xul:hbox class="thinger-placesbar" flex="1" asyncinit="true" context="placesContext">
@@ -59,8 +67,8 @@
       <method name="_init">
         <body>
         <![CDATA[
-          this._bookmarkBar.setAttribute("place", this._getAttribute("root", "place:&folder=3&group=3&expandQueries=1"));
-          this._bookmarkBar.init();
+          this._bookmarkBar.setAttribute("place", this._getAttribute("root"));
+          this._bookmarkBar._init();
 
           this._settings.setAttribute("label", this._bookmarkBar._result.root.title+" Items");
           this._barLabel.setAttribute("label", this._bookmarkBar._result.root.title+" Items");

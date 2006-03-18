@@ -43,6 +43,7 @@
  */
 
 var settings = window.arguments[0].settings;
+var defaults = window.arguments[0].defaults;
 var thing = window.arguments[0].thing;
 
 function setup()
@@ -63,9 +64,12 @@ function persistSettings()
 function getAttribute(name, def)
 {
   if (!settings.hasAttribute(name))
-    return def;
+    return settings.getAttribute(name);
     
-  return settings.getAttribute(name);
+  if (!defaults.hasAttribute(name))
+    return defaults.getAttribute(name);
+    
+  return def;
 }
 
 function setAttribute(name, value)

@@ -53,6 +53,8 @@ interface mIThingerService : nsISupports
 	
 	nsIDOMElement getThingSettings(in nsIDOMXULElement thing);
 	
+	nsIDOMElement getThingDefaults(in nsIDOMXULElement thing);
+	
 	void deleteThing(in nsIDOMXULElement thing);
 	
 	void importThings(in nsIDOMXULElement toolbox);

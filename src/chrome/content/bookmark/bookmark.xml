@@ -65,7 +65,7 @@
           this._bms = Components.classes["@mozilla.org/browser/nav-bookmarks-service;1"]
                                 .getService(Components.interfaces.nsINavBookmarksService);
 
-          var queryString = this._getAttribute("root", "");
+          var queryString = this._getAttribute("root");
  
           if (queryString.substring(0,6)=="place:")
           {
@@ -150,7 +150,6 @@
             else
             {
 	            popup.setAttribute("place", this._resultNode.uri);
-	            popup.init();
 	          }
           }
 

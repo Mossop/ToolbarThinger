@@ -7,7 +7,7 @@ toolbar .thinger-item[thingtype="bookmark-toolbar"] {
 }
 
 .thinger-placesbar {
-  -moz-binding: url('chrome://browser/content/places/toolbar.xml#places-bar');
+  -moz-binding: url('chrome://thinger/content/bookmark/toolbar.xml#places-bar');
   overflow: hidden;
 }
 
