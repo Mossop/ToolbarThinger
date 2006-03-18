@@ -1,3 +1,8 @@
 .thinger-item {
   -moz-binding: url('chrome://thinger/content/bindings/thing.xml#button-thing');
 }
+
+.thinger-item .toolbarbutton-icon {
+  height: 16px;
+  width: 16px;
+}

@@ -46,10 +46,6 @@
           xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
   <binding id="thing" display="xul:toolbaritem">
-    <content>
-      <xul:toolbarbutton label="New Thinger"/>
-    </content>
-
     <implementation>
       
       <constructor>
@@ -129,7 +125,17 @@
         <body>
           NS_ASSERT(this._settings, "Thing not properly initialised");
           
-          return this._settings.setAttribute(name, value);
+          this._settings.setAttribute(name, value);
+          this._service.persistThings();
+        </body>
+      </method>
+      
+      <method name="_removeAttribute">
+        <parameter name="name"/>
+        <body>
+          NS_ASSERT(this._settings, "Thing not properly initialised");
+          
+          this._settings.removeAttribute(name);
           this._service.persistThings();
         </body>
       </method>
@@ -205,19 +211,45 @@
   </binding>
   
   <binding id="button-thing" extends="chrome://thinger/content/bindings/thing.xml#thing">
+    <content>
+      <xul:toolbarbutton onerror="this.parentNode.loadError(event);"/>
+    </content>
     <implementation>
       <property name="_button" onget="return document.getAnonymousNodes(this)[0]"/>
       
-      <method name="_init">
+      <method name="_applyButtonSettings">
         <body>
           if (this._hasAttribute("label"))
+          {
             this._button.setAttribute("label", this._getAttribute("label"));
+            this._button.setAttribute("tooltiptext", this._getAttribute("label"));
+          }
+          else
+          {
+            this._button.removeAttribute("label");
+            this._button.removeAttribute("tooltiptext");
+          }
 
           if (this._hasAttribute("image"))
             this._button.setAttribute("image", this._getAttribute("image"));
+          else
+            this._button.removeAttribute("image");
         </body>
       </method>
       
+      <method name="_init">
+        <body>
+          this._applyButtonSettings();
+        </body>
+      </method>
+      
+      <method name="loadError">
+        <parameter name="event"/>
+        <body>
+          this._button.removeAttribute("image");
+          this._removeAttribute("image");
+        </body>
+      </method>
     </implementation>
   </binding>
 

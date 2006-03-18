@@ -61,6 +61,12 @@
     <textbox id="titlebox" flex="1"/>
   </hbox>
 
+  <hbox>
+    <label control="titlebox" value="&thinger.script.options.icon.label;"/>
+    <textbox id="iconbox" flex="1"/>
+    <button label="&thinger.script.options.browse.label;" id="iconbrowse" oncommand="onBrowse()"/>
+  </hbox>
+
   <textbox id="codebox" style="font-family: monospace" multiline="true" flex="1"/>
    
 </dialog>

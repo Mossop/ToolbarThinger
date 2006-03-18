@@ -1,3 +1,5 @@
-<!ENTITY thinger.script.options.title        "Script Options">
+<!ENTITY thinger.script.options.title          "Script Options">
 
-<!ENTITY thinger.script.options.title.label  "Title:">
+<!ENTITY thinger.script.options.title.label    "Title:">
+<!ENTITY thinger.script.options.browse.label   "Browse...">
+<!ENTITY thinger.script.options.icon.label     "Icon:">

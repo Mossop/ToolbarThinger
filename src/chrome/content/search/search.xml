@@ -56,23 +56,40 @@
   
   <binding id="searchbar" extends="chrome://browser/content/search/search.xml#searchbar">
     <implementation>
+      <field name="_engine">null</field>
+      
       <property name="currentEngine">
         <getter>
-          if (this.parentNode._settings.hasAttribute("engine"))
+          if (!this._engine)
           {
-            var engine = this.searchService.getEngineByName(this.parentNode._settings.getAttribute("engine"));
-            if (engine)
-              return engine;
+            if (this.parentNode._hasAttribute("engine"))
+            {
+              this._engine = this.searchService.getEngineByName(this.parentNode._settings.getAttribute("engine"));
+            }
+            if (!this._engine)
+            {
+              this._engine = this.searchService.currentEngine;
+            }
           }
-          return this.searchService.currentEngine;
+          return this._engine;
         </getter>
         
         <setter>
-          if (val)
-            this.parentNode._settings.setAttribute("engine", val.name);
+          if (!val)
+            val = this.searchService.currentEngine;
+            
+          this.parentNode._setAttribute("engine", val.name);
+          var icon = val.iconURI;
+          if (icon)
+            this.parentNode._setAttribute("image", icon.spec);
           else
-            this.parentNode._settings.removeAttribute("engine");
+            this.parentNode._removeAttribute("image");
+          var name = val.name;
+          var text = this._stringBundle.getFormattedString("searchtip", [name]);
+          this.parentNode._setAttribute("label", text);
           this.parentNode._service.persistThings();
+
+          this._engine = val;
           this.updateDisplay();
         </setter>
       </property>

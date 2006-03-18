@@ -56,6 +56,7 @@
           var code = this._getText("code", null);
           if (code)
             this._script = new Function("event", "document", "window", code);
+          this._applyButtonSettings();
         ]]>
         </body>
       </method>
@@ -69,6 +70,8 @@
       <method name="onCommand">
         <parameter name="event"/>
         <body>
+          NS_ASSERT(this._script, "No code defined to run.");
+          
           var doc = document;
           var win = window;
           if (false)
@@ -80,8 +83,6 @@
           
           if (this._script)
             this._script.call(this, event, doc, win);
-          else
-            alert("Oops, no code to run");
         </body>
       </method>
     </implementation>

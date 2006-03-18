@@ -63,10 +63,10 @@ function persistSettings()
 
 function getAttribute(name, def)
 {
-  if (!settings.hasAttribute(name))
+  if (settings.hasAttribute(name))
     return settings.getAttribute(name);
     
-  if (!defaults.hasAttribute(name))
+  if (defaults.hasAttribute(name))
     return defaults.getAttribute(name);
     
   return def;
@@ -115,6 +115,17 @@ function setText(name, value)
 		}
 		else
 			node = node[0];
+	}
+	
+	var sub = node.firstChild;
+	while (sub)
+	{
+		var next = sub.nextSibling;
+		if (sub.nodeType == Node.TEXT_NODE)
+		{
+			node.removeChild(sub);
+		}
+		sub = next;
 	}
 	
 	node.appendChild(node.ownerDocument.createTextNode(value));

@@ -45,12 +45,35 @@
 function onLoad()
 {
 	document.getElementById("titlebox").value=getAttribute("label", "");
+	document.getElementById("iconbox").value=getAttribute("image", "");
 	document.getElementById("codebox").value=getText("code", "");
 }
 
 function onAccept()
 {
 	setAttribute("label", document.getElementById("titlebox").value);
+	setAttribute("image", document.getElementById("iconbox").value);
 	setText("code", document.getElementById("codebox").value);
 	persistSettings();
+}
+
+function onBrowse()
+{
+	var fp = Components.classes["@mozilla.org/filepicker;1"]
+	                   .createInstance(Components.interfaces.nsIFilePicker);
+	fp.init(window, "Select Log File", fp.modeOpen);
+	fp.appendFilter("Image files", "*.jpg;*.gif;*.png");
+	fp.appendFilter("All Files (*.*)", "*.*");
+		
+	if (fp.show() == fp.returnOK)
+	{
+		var item=fp.file;
+		if (item.exists())
+		{
+			var itemURI = Components.classes["@mozilla.org/network/io-service;1"]
+		                          .getService(Components.interfaces.nsIIOService)
+		                          .newFileURI(item);
+		  document.getElementById("iconbox").value=itemURI.spec;
+		}
+	}
 }

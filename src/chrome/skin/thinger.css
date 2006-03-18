@@ -7,11 +7,13 @@
 }
 
 .thinger-item[thingtype="bookmark-toolbar"] {
+  list-style-image: url('chrome://thinger/skin/toolbar.png');
 }
 
-.thinger-item[thingtype="search"] {
+#thinger-palette .thinger-item[thingtype="search"] {
   list-style-image: url('chrome://thinger/skin/search.png');
 }
 
-toolbar .thinger-item[thingtype="script"] {
+.thinger-item[thingtype="script"] {
+  list-style-image: url('chrome://thinger/skin/script.png');
 }

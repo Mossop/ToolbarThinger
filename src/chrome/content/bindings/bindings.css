@@ -23,6 +23,11 @@ toolbar .thinger-item[thingtype="script"] {
   -moz-binding: url('chrome://thinger/content/script/script.xml#script');
 }
 
+toolbar .thinger-item[thingtype="script"] .toolbarbutton-icon {
+  width: 16px;
+  height: 16px;
+}
+
 .thinger-customise {
   -moz-binding: url("chrome://thinger/content/bindings/thing.xml#customise");
 }
