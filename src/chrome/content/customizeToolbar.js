@@ -84,6 +84,8 @@ var thinger = {
 			                                      "spacer");
 			spacer.setAttribute("flex", "0");
 			mypalette.firstChild.appendChild(spacer);
+			
+			window.innerHeight+=mypalette.parentNode.boxObject.height;
 		}
 	},
 	
