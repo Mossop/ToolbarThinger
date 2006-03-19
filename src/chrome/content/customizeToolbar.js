@@ -45,12 +45,15 @@
 var thinger = {
 	
 	service: null,
+	oldOnLoad: null,
+	oldOnAccept: null,
+	windowHeight: kWindowHeight,
 
-	init: function(event)
+	onLoad: function(event)
 	{
 		try
 		{
-			oldOnLoad();
+			thinger.oldOnLoad();
 		}
 		catch (e)
 		{
@@ -85,11 +88,12 @@ var thinger = {
 			spacer.setAttribute("flex", "0");
 			mypalette.firstChild.appendChild(spacer);
 			
-			window.innerHeight+=mypalette.parentNode.boxObject.height;
+			thinger.windowHeight+=mypalette.parentNode.boxObject.height;
+			repositionDialog();
 		}
 	},
 	
-	accept: function(event)
+	onAccept: function(event)
 	{
 		if (gToolboxDocument.defaultView.thinger)
 		{
@@ -123,7 +127,24 @@ var thinger = {
 			// Persist the thing cache.
 			thinger.service.persistThings();
 		}
-		oldOnAccept();
+		thinger.oldOnAccept();
+	},
+	
+	repositionDialog: function()
+	{
+	  // Position the dialog touching the bottom of the toolbox and centered with 
+	  // it. We must resize the window smaller first so that it is positioned 
+	  // properly. 
+	  var screenX = gToolbox.boxObject.screenX + ((gToolbox.boxObject.width - kWindowWidth) / 2);
+	  var screenY = gToolbox.boxObject.screenY + gToolbox.boxObject.height;
+	
+	  var newHeight = thinger.windowHeight;
+	  if (newHeight >= screen.availHeight - screenY - kVSizeSlop) {
+	    newHeight = screen.availHeight - screenY - kVSizeSlop;
+	  }
+	
+	  window.resizeTo(kWindowWidth, newHeight);
+	  window.moveTo(screenX, screenY);
 	},
 	
 	addCustomiser: function(item)
@@ -293,8 +314,11 @@ var thinger = {
 	}
 }
 
-var oldOnLoad = onLoad;
-onLoad = thinger.init;
+thinger.oldOnLoad = onLoad;
+onLoad = thinger.onLoad;
 
-var oldOnAccept = onAccept;
-onAccept = thinger.accept;
+thinger.oldOnAccept = onAccept;
+onAccept = thinger.onAccept;
+
+thinger.oldRepositionDialog = repositionDialog;
+repositionDialog = thinger.repositionDialog;

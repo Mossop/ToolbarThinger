@@ -46,6 +46,7 @@
 
 <?xml-stylesheet href="chrome://global/skin" type="text/css"?>
 <?xml-stylesheet href="chrome://browser/content/places/places.css"?>
+<?xml-stylesheet href="chrome://browser/skin/places/places.css"?>
 
 <dialog title="&thinger.bookmark.options.title;"
         buttons="accept,cancel"
@@ -58,11 +59,11 @@
   <script src="chrome://thinger/content/options.js"/>
   <script src="options.js"/>
   
-  <tree id="placeContent" flex="1" query="" type="places">
+  <tree id="placeContent" class="placesTree" flex="1" type="places" hidecolumnpicker="true">
     <treecols>
-      <treecol id="title" flex="5" primary="true"/>
+      <treecol id="title" flex="5" primary="true" hideheader="true"/>
     </treecols>
-    <treechildren view="placeContent" flex="1"/>
+    <treechildren id="placeContentChildren" view="placeContent" flex="1"/>
   </tree>
      
 </dialog>

@@ -42,6 +42,7 @@
  *
  */
 
+var args = window.arguments[0].extra;
 var settings = window.arguments[0].settings;
 var defaults = window.arguments[0].defaults;
 var thing = window.arguments[0].thing;

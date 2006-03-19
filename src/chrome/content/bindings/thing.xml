@@ -176,12 +176,14 @@
       
       <method name="_configure">
         <parameter name="uri"/>
+        <parameter name="parameters"/>
         <body>
           var args = {
             settings: this._settings,
             defaults: this._defaults,
             thing: this,
-            force: !this.customised
+            force: !this.customised,
+            extra: parameters
           };
           var features = "chrome,titlebar,toolbar,centerscreen,modal";
           if (!this.customised)
