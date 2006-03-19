@@ -57,8 +57,8 @@ function onLoad()
   query.onlyBookmarked=true;
   var options = places.getNewQueryOptions();
   options.setGroupingMode([Components.interfaces.nsINavHistoryQueryOptions.GROUP_BY_FOLDER], 1);
-  options.expandQueries = true;
-  options.excludeItems = args.onlyFolders;
+  tree.expandQueries = true;
+  tree.excludeItems = args.onlyFolders;
 	tree._load([query], options);
 	tree.selectPlaceURI(getAttribute("root"));
 }
