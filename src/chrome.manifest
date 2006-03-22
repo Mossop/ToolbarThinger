@@ -1,7 +1,7 @@
-content			thinger																							file:chrome/content/
-skin				thinger							classic/1.0											file:chrome/skin/
+content			thinger																							${extension.chromebase}/content/
+skin				thinger							classic/1.0											${extension.chromebase}/skin/
 
-locale			thinger							en-US														file:chrome/locale/en-US/
+locale			thinger							en-US														${extension.chromebase}/locale/en-US/
 
 overlay			chrome://global/content/customizeToolbar.xul				chrome://thinger/content/customizeToolbar.xul
 
