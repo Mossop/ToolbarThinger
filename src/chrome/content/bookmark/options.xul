@@ -59,7 +59,9 @@
   <script src="chrome://thinger/content/options.js"/>
   <script src="options.js"/>
   
-  <tree id="placeContent" class="placesTree" flex="1" type="places" hidecolumnpicker="true">
+  <tree id="placeContent" class="placesTree" flex="1" type="places" 
+        place="place:&amp;folder=1&amp;group=3&amp;excludeItems=1"
+        hidecolumnpicker="true">
     <treecols>
       <treecol id="title" flex="5" primary="true" hideheader="true"/>
     </treecols>
