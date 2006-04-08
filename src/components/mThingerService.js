@@ -120,12 +120,8 @@ loadXMLFromURI: function(uri)
 	try
 	{
 		if (typeof uri == "string")
-		{
-			var rluri = Components.classes["@mozilla.org/network/standard-url;1"]
-			                      .createInstance(Components.interfaces.nsIURI);
-			rluri.spec = uri;
-			uri = rluri;
-		}
+			uri = ios.newURI(uri, null, null);
+
 		var channel = ios.newChannelFromURI(uri);
 		var stream = channel.open();
 		cache = parser.parseFromStream(stream, "UTF8", channel.contentLength, "text/xml");
