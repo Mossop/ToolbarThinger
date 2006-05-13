@@ -20,7 +20,9 @@
     <em:name>Thinger</em:name>
     <em:description>Lets you add things to your toolbar!</em:description>
     <em:creator>Mossop</em:creator>
-    <em:homepageURL>http://users.blueprintit.co.uk/~dave/web/firefox/Thinger/index.html</em:homepageURL>
+
+    <em:homepageURL>http://users.blueprintit.co.uk/~dave/web/firefox/${extension.name}</em:homepageURL>
+    <em:updateURL>http://users.blueprintit.co.uk/~dave/web/firefox/${extension.name}/update.rdf</em:updateURL>
     
   </Description>      
 </RDF>
