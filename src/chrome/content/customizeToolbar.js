@@ -47,7 +47,6 @@ var thinger = {
 	service: null,
 	oldOnLoad: null,
 	oldOnAccept: null,
-	windowHeight: kWindowHeight,
 
 	onLoad: function(event)
 	{
@@ -88,8 +87,8 @@ var thinger = {
 			spacer.setAttribute("flex", "0");
 			mypalette.firstChild.appendChild(spacer);
 			
-			thinger.windowHeight+=mypalette.parentNode.boxObject.height;
-			repositionDialog();
+			//thinger.windowHeight+=mypalette.parentNode.boxObject.height;
+			//repositionDialog();
 		}
 	},
 	
@@ -320,5 +319,3 @@ onLoad = thinger.onLoad;
 thinger.oldOnAccept = onAccept;
 onAccept = thinger.onAccept;
 
-thinger.oldRepositionDialog = repositionDialog;
-repositionDialog = thinger.repositionDialog;

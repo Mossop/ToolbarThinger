@@ -100,7 +100,7 @@
       
       <method name="customise">
         <body>
-        	this._configure("chrome://thinger/content/bookmark/options.xul", { onlyFolders: false });
+        	this._configure("chrome://thinger/content/places/options.xul", { onlyFolders: false });
         </body>
       </method>
       

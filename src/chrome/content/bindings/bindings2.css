@@ -1,14 +1,9 @@
 toolbar .thinger-item[thingtype="bookmark-item"] {
-  -moz-binding: url('chrome://thinger/content/bookmark/bookmark.xml#bookmark');
+  -moz-binding: url('chrome://thinger/content/bookmarks/bookmark.xml#bookmark');
 }
 
 toolbar .thinger-item[thingtype="bookmark-toolbar"] {
-  -moz-binding: url('chrome://thinger/content/bookmark/toolbar.xml#toolbar');
-}
-
-.thinger-placesbar {
-  -moz-binding: url('chrome://thinger/content/bookmark/toolbar.xml#places-bar');
-  overflow: hidden;
+  -moz-binding: url('chrome://thinger/content/bookmarks/toolbar.xml#toolbar');
 }
 
 toolbar .thinger-item[thingtype="search"] {

@@ -42,56 +42,22 @@
    - $Revision$
    -->
 
-<bindings xmlns="http://www.mozilla.org/xbl"
-          xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+<!DOCTYPE dialog SYSTEM "chrome://thinger/locale/bookmark.dtd">
 
-  <binding id="search" extends="chrome://thinger/content/bindings/thing.xml#thing">
-    <content>
-      <searchbar class="thinger-searchbar" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"/>
-    </content>
+<?xml-stylesheet href="chrome://global/skin" type="text/css"?>
+<?xml-stylesheet href="chrome://browser/content/bookmarks/bookmarks.css" type="text/css"?>
 
-    <implementation>
-    </implementation>
-  </binding>
+<dialog title="&thinger.bookmark.options.title;"
+        buttons="accept,cancel"
+        ondialogaccept="onAccept()"
+        onload="onLoad()" style="width: 400px; height: 500px;"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   
-  <binding id="searchbar" extends="chrome://browser/content/search/search.xml#searchbar">
-    <implementation>
-      <field name="_engine">null</field>
-      
-      <property name="currentEngine">
-        <getter>
-          if (!this._engine)
-          {
-            if (this.parentNode._hasAttribute("engine"))
-              this._engine = this.searchService.getEngineByName(this.parentNode._settings.getAttribute("engine"));
-            if (!this._engine)
-              this._engine = this.searchService.currentEngine;
-          }
-          return this._engine;
-        </getter>
-        
-        <setter>
-          if (!val)
-            val = this.searchService.currentEngine;
-            
-          this.parentNode._setAttribute("engine", val.name);
-          var icon = val.iconURI;
-          if (icon)
-            this.parentNode._setAttribute("image", icon.spec);
-          else
-            this.parentNode._removeAttribute("image");
-          var name = val.name;
-          var text = this._stringBundle.getFormattedString("searchtip", [name]);
-          this.parentNode._setAttribute("label", text);
-          this.parentNode._service.persistThings();
-
-          this._engine = val;
-          this.rebuildPopup();
-          this.updateDisplay();
-          this._textbox._displayCurrentEngine();
-        </setter>
-      </property>
-    </implementation>
-  </binding>
-
-</bindings>
+  <script type="application/x-javascript" src="chrome://global/content/debug.js"/>
+  <script type="application/x-javascript" src="chrome://browser/content/bookmarks/bookmarks.js"/>
+  <script type="application/x-javascript" src="chrome://thinger/content/options.js"/>
+  <script type="application/x-javascript" src="options.js"/>
+  
+  <bookmarks-tree id="bookmarksTree" flex="1"/>
+     
+</dialog>

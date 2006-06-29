@@ -17,3 +17,11 @@
 .thinger-item[thingtype="script"] {
   list-style-image: url('chrome://thinger/skin/script.png');
 }
+
+.thinger-searchbar[empty="true"] .searchbar-textbox {
+  color: graytext;
+}
+
+.thinger-item[thingtype="bookmark-toolbar"] .bookmarks-toolbar-customize {
+  list-style-image: url('chrome://thinger/skin/toolbar.png') !important;
+}
