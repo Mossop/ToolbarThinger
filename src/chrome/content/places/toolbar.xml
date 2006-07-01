@@ -48,27 +48,32 @@
   <binding id="places-bar" extends="chrome://browser/content/places/toolbar.xml#places-bar">
     <implementation>
       <constructor>
-        // Don't do anything silly like trying to initialise before I want you to.
       </constructor>
     </implementation>
   </binding>
   
   <binding id="toolbar" extends="chrome://thinger/content/bindings/thing.xml#thing">
     <content>
-      <xul:hbox class="thinger-placesbar" flex="1" asyncinit="true" context="placesContext">
-        <children/>
-      </xul:hbox>
+      <children/>
     </content>
 
     <implementation>
-      <property name="_bookmarkBar" onget="return document.getAnonymousNodes(this)[0]"/>
+      <property name="_bookmarkBar" onget="return this.firstChild"/>
       <property name="_barLabel" onget="return document.getAnonymousNodes(this._bookmarkBar)[0].childNodes[1].childNodes[2]"/>
       
       <method name="_init">
         <body>
         <![CDATA[
-          this._bookmarkBar.setAttribute("place", this._getAttribute("root"));
-          this._bookmarkBar._init();
+          if (this._bookmarkBar)
+            this._destroy();
+            
+          var bar = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "hbox");
+          bar.setAttribute("place", this._getAttribute("root"));
+          bar.setAttribute("class", "thinger-placesbar");
+          bar.setAttribute("flex", "1");
+          bar.setAttribute("context", "placesContext");
+          this.appendChild(bar);
+          bar._init();
 
           this._settings.setAttribute("label", this._bookmarkBar._result.root.title+" Items");
           this._barLabel.setAttribute("label", this._bookmarkBar._result.root.title+" Items");
@@ -84,14 +89,17 @@
         <body>
           try
           {
-            this._bookmarkBar._bms.removeObserver(this._bookmarkBar._observer);
+            if (this._bookmarkBar)
+              this._bookmarkBar._bms.removeObserver(this._bookmarkBar._observer);
           }
           catch (e)
           {
           }
+          while (this.firstChild)
+            this.removeChild(this.firstChild);
         </body>
       </method>
-
+      
       <method name="customise">
         <body>
           this._configure("chrome://thinger/content/places/options.xul", { onlyFolders: true });

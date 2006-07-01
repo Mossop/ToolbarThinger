@@ -69,7 +69,26 @@ function onLoad()
 
 function onAccept()
 {
-	var node = tree.selectedNode;
-	setAttribute("root", node.uri);
+	var uri = tree.selectedNode.uri;
+
+	var pos = uri.indexOf("&excludeItems=1");
+	if (pos>=0)
+	{
+		uri = uri.substring(0,pos)+uri.substring(pos+15);
+	}
+
+	pos = uri.indexOf("excludeItems=1&");
+	if (pos>=0)
+	{
+		uri = uri.substring(0,pos)+uri.substring(pos+15);
+	}
+
+	pos = uri.indexOf("?excludeItems=1");
+	if (pos>=0)
+	{
+		uri = uri.substring(0,pos)+uri.substring(pos+15);
+	}
+
+	setAttribute("root", uri);
 	persistSettings();
 }

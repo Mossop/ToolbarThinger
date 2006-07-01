@@ -238,7 +238,6 @@ createThing: function(toolbox, type)
 		items = things.createElementNS("http://users.blueprintit.co.uk/~dave/web/firefox/Thinger", "toolbox");
 		things.documentElement.appendChild(items);
 		items.setAttribute("id", node);
-		LOG("Added toolbox: "+node);
 	}
 	
 	var uid = this.createUID();
@@ -252,7 +251,6 @@ createThing: function(toolbox, type)
 	
 	thing.setAttribute("id", uid);
 	items.appendChild(thing);
-	LOG("Added: "+uid);
 	
 	return this.createToolbarItem(toolbox.palette, thing);
 },
@@ -260,14 +258,12 @@ createThing: function(toolbox, type)
 getThingSettings: function(item)
 {
 	var id = item.getAttribute("id").substring(8);
-	LOG("Looking for settings of "+id);
 	return this.things.getElementById(id);
 },
 
 getThingDefaults: function(item)
 {
 	var id = item.getAttribute("id").substring(8);
-	LOG("Looking for defaults of "+id);
 	var thing = this.things.getElementById(id);
 	var type = thing.getAttribute("type");
 	var defaults = this.defaults.getElementsByAttribute("type", type);
@@ -289,7 +285,6 @@ deleteThing: function(item)
 		items.removeChild(thing);
 		if (!items.firstChild)
 			items.parentNode.removeChild(items);
-		LOG("Deleted: "+item.getAttribute("id").substring(8));
 	}
 	else
 	{
@@ -313,7 +308,6 @@ importThings: function(toolbox)
 		{
 			if (thing.nodeType==things.ELEMENT_NODE)
 			{
-				LOG("Importing: "+thing.getAttribute("id"));
 				this.createToolbarItem(toolbox.palette, thing);
 				thing=thing.nextSibling;
 			}

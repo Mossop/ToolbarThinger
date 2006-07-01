@@ -45,11 +45,9 @@
 <bindings xmlns="http://www.mozilla.org/xbl"
           xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-  <binding id="bookmark" extends="chrome://thinger/content/bindings/thing.xml#button-thing">
+  <binding id="bookmark" extends="chrome://thinger/content/bindings/thing.xml#thing">
     <content>
-      <xul:toolbarbutton context="placesContext" label="New Bookmark Thinger" class="menuitem-iconic bookmark-item">
-        <children/>
-      </xul:toolbarbutton>
+      <children/>
     </content>
 
     <implementation>
@@ -98,6 +96,13 @@
         </body>
       </method>
       
+      <method name="_destroy">
+        <body>
+          while (this.firstChild)
+            this.removeChild(this.firstChild);
+        </body>
+      </method>
+      
       <method name="customise">
         <body>
         	this._configure("chrome://thinger/content/places/options.xul", { onlyFolders: false });
@@ -106,54 +111,51 @@
       
       <method name="_rebuild">
         <body>
-          while (this.firstChild)
-            this.removeChild(this.firstChild);
-          
-          this._button.setAttribute("label", this._resultNode.title);
+          var button = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "toolbarbutton");
+          button.setAttribute("label", this._resultNode.title);
+          button.setAttribute("context", "placesContext");
+          button.setAttribute("class", "menuitem-iconic bookmark-item");
           this._settings.setAttribute("label", this._resultNode.title);
           if (this._resultNode.icon)
           {
-            dump("Setting icon to "+this._resultNode.icon.spec+"\n");
-            this._button.setAttribute("image", this._resultNode.icon.spec);
+            button.setAttribute("image", this._resultNode.icon.spec);
             this._settings.setAttribute("image", this._resultNode.icon.spec);
           }
           else
-          {
-            this._button.removeAttribute("image");
             this._settings.removeAttribute("image");
-          }
           
+          this.appendChild(button);
+
           if (PlacesController.nodeIsURI(this._resultNode))
-          {
-            this._button.setAttribute("url", this._resultNode.uri);
-            this._button.removeAttribute("type");
-            this._button.removeAttribute("container");
-            if (this._button.firstChild)
-              this._button.removeChild(this._button.firstChild);
-          }
+            button.setAttribute("url", this._resultNode.uri);
           else if (PlacesController.nodeIsContainer(this._resultNode))
           {
-            this._button.setAttribute("type", "menu");
-            this._button.setAttribute("container", "true");
-            var popup = this._button.firstChild;
-            if (!this._button.firstChild)
-            {
-              popup = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "menupopup");
-              popup.setAttribute("type", "places");
-              popup.setAttribute("context", "placesContext");
-              popup.setAttribute("asyncinit", "true");
-	            //popup.setAttribute("place", this._resultNode.uri);
-              this._button.appendChild(popup);
-            }
-            else
-            {
-	            //popup.setAttribute("place", this._resultNode.uri);
-	          }
-            popup._result = this._result;
-            popup._resultNode = this._resultNode;
-          }
+            button.setAttribute("type", "menu");
+            button.setAttribute("container", "true");
 
-          this._button.node = this._resultNode;
+            if (PlacesController.nodeIsLivemarkContainer(this._resultNode)) {
+              button.setAttribute("livemark", "true");
+              var folder = asFolder(this._resultNode).folderId;
+              var bms =
+                Cc["@mozilla.org/browser/nav-bookmarks-service;1"].
+                getService(Ci.nsINavBookmarksService);
+              var lms =
+                Cc["@mozilla.org/browser/livemark-service;1"].
+                getService(Ci.nsILivemarkService);
+              var siteURI = lms.getSiteURI(folder);
+              if (siteURI) {            
+                button.setAttribute("siteURI", siteURI.spec);
+              }
+            }
+
+            var popup = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "menupopup");
+            popup.setAttribute("type", "places");
+            popup.setAttribute("context", "placesContext");
+            popup.setAttribute("asyncinit", "true");
+            button.appendChild(popup);
+            popup.setResultAndNode(this._result, this._resultNode);
+          }
+          
           this._service.persistThings();
         </body>
       </method>
@@ -291,7 +293,7 @@
       <method name="eventValid">
         <parameter name="event"/>
         <body><![CDATA[
-          if (event.target != this)
+          if (event.target != this.firstChild)
             return false;
           return true;
         ]]></body>
@@ -318,14 +320,14 @@
       <handler event="popupshowing">
         BookmarksEventHandler.onPopupShowing(event);
       </handler>
-      <handler event="mousedown"><![CDATA[
+      <handler event="mousedown">
         if (this.eventValid(event))
           this.setSelectionForEvent(event);
-      ]]></handler>
-      <handler event="DOMMenuItemActive"><![CDATA[
+      </handler>
+      <handler event="DOMMenuItemActive">
         if (this.eventValid(event))
           this.setSelectionForEvent(event);
-      ]]></handler>
+      </handler>
     </handlers>
   </binding>
 

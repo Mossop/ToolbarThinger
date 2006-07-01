@@ -224,11 +224,8 @@ var thinger = {
 	
 	toolboxItemAdded: function(event)
 	{
-		dump("toolboxItemAdded: "+event.target.localName+"\n");
 		if (event.target.localName=="toolbarpaletteitem" && event.target.firstChild.hasAttribute("thingtype"))
-		{
 			thinger.addCustomiser(event.target);
-		}
 	},
 	
 	toolboxItemRemoved: function(event)
@@ -300,7 +297,6 @@ var thinger = {
 		// The item holder is the last removed so when this is gone we re-create.
 		if (event.target.id.substring(0,16)=="wrapper-thinger-")
 		{
-			dump("Detected item removal\n");
 			var type = event.target.firstChild.getAttribute("thingtype");
 			event.target.parentNode.insertBefore(thinger.createCustom(type), event.target.nextSibling);
 			var spacer = event.target.parentNode.lastChild;
