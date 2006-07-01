@@ -63,7 +63,7 @@ function onLoad()
   options.setGroupingMode([Components.interfaces.nsINavHistoryQueryOptions.GROUP_BY_FOLDER], 1);
   options.excludeQueries = true;
 
-	tree._load([query], options);
+	tree.load([query], options);
 	tree.selectPlaceURI(getAttribute("root"));
 }
 

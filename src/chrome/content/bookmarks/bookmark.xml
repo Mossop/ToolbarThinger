@@ -92,6 +92,7 @@
           var button = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "toolbarbutton");
           button.setAttribute("id", this._getAttribute("root"));
           button.setAttribute("ref", this._getAttribute("root"));
+          //button.setAttribute("contextmenu", "bookmarks-context-menu");
           if ((type == 'http://home.netscape.com/NC-rdf#Livemark') || (type == 'http://home.netscape.com/NC-rdf#Folder'))
           {
             button.className = "bookmark-item";
@@ -103,8 +104,9 @@
             button.setAttribute("label", this._getLiteral(gRDF, ds, resource, "http://home.netscape.com/NC-rdf#Name"));
             if (type == 'http://home.netscape.com/NC-rdf#Livemark')
               button.setAttribute("livemark", "true");
-            var popup = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "menupopup");
             button.setAttribute("template", "bookmarks-template");
+            var popup = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "menupopup");
+            //popup.setAttribute("contextmenu", "bookmarks-context-menu");
             button.appendChild(popup);
           }
           else

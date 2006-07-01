@@ -131,7 +131,7 @@
             if (this._button.firstChild)
               this._button.removeChild(this._button.firstChild);
           }
-          else if (PlacesController.nodeIsFolder(this._resultNode))
+          else if (PlacesController.nodeIsContainer(this._resultNode))
           {
             this._button.setAttribute("type", "menu");
             this._button.setAttribute("container", "true");
@@ -142,13 +142,15 @@
               popup.setAttribute("type", "places");
               popup.setAttribute("context", "placesContext");
               popup.setAttribute("asyncinit", "true");
-	            popup.setAttribute("place", this._resultNode.uri);
+	            //popup.setAttribute("place", this._resultNode.uri);
               this._button.appendChild(popup);
             }
             else
             {
-	            popup.setAttribute("place", this._resultNode.uri);
+	            //popup.setAttribute("place", this._resultNode.uri);
 	          }
+            popup._result = this._result;
+            popup._resultNode = this._resultNode;
           }
 
           this._button.node = this._resultNode;
@@ -162,42 +164,45 @@
         </body>
       </method>
  
-      <property name="isBookmarks">
-        <getter><![CDATA[ 
-          return PlacesController.nodeIsFolder(this.getResult());
-        ]]></getter>
-      </property>
+      <property name="browserWindow" onget="return window;"/>
       
+      <property name="selType" onget="return 'single';"/>
+
       <property name="hasSelection">
         <getter><![CDATA[ 
           return this._resultNode != null;
         ]]></getter>
       </property>
       
+      <!-- nsIPlacesView -->
       <property name="hasSingleSelection">
         <getter><![CDATA[ 
           return this.hasSelection;
         ]]></getter>
       </property>
       
+      <!-- nsIPlacesView -->
       <method name="getSelectionNodes">
         <body><![CDATA[
           return this.hasSelection ? [this.selectedNode] : [];
         ]]></body>
       </method>
       
+      <!-- nsIPlacesView -->
       <method name="getRemovableSelectionRanges">
         <body><![CDATA[ 
           return [this.getSelectionNodes()];
         ]]></body>
       </method>
       
+      <!-- nsIPlacesView -->
       <method name="getCopyableSelection">
         <body><![CDATA[
           return this.getSelectionNodes();
         ]]></body>
       </method>
       
+      <!-- nsIPlacesView -->
       <method name="getDragableSelection">
         <body><![CDATA[
           if (PlacesController.nodeIsReadOnly(this._resultNode))
@@ -206,12 +211,14 @@
         ]]></body>
       </method>
       
+      <!-- nsIPlacesView -->
       <property name="selectedNode">
         <getter><![CDATA[ 
           return this.hasSelection ? this._resultNode : null;
         ]]></getter>
       </property>
       
+      <!-- nsIPlacesView -->
       <property name="selectedURINode">
         <getter><![CDATA[
           var node = this.selectedNode;
@@ -219,26 +226,65 @@
         ]]></getter>
       </property>
       
-      <property name="browserWindow" onget="return window;"/>
+      <!-- nsIPlacesView -->
+      <property name="insertionPoint">
+        <getter><![CDATA[ 
+          // By default, the insertion point is at the top level, at the end. 
+          var index = -1;
+          var folderId = 0;
+          if(PlacesController.nodeIsFolder(this._resultNode))
+            folderId = this._resultNode.QueryInterface(Ci.nsINavHistoryFolderResultNode).folderId;
+          
+          if (this.hasSelection) {
+            if(PlacesController.nodeIsFolder(this.selectedNode)) {
+              // If there is a folder selected, the insertion point is the
+              // end of the folder.
+              folderId = this.selectedNode.QueryInterface(Ci.nsINavHistoryFolderResultNode).folderId;
+            } else {
+              // If there is another type of node selected, the insertion point
+              // is after that node.
+              index = PlacesController.getIndexOfNode(this.selectedNode)
+            }
+          }
+          return new InsertionPoint(folderId, index);
+        ]]></getter>
+      </property>
       
-      <property name="supportedDropTypes">
-        <getter>
-          if (PlacesController.nodeIsFolder(this._resultNode))
-            return [TYPE_X_MOZ_PLACE_CONTAINER, TYPE_X_MOZ_PLACE_SEPARATOR, TYPE_X_MOZ_PLACE, TYPE_X_MOZ_URL];
-          else
-            return [];
-        </getter>
-      </property>
-
-      <property name="supportedDropOnTypes">
-        <getter>
-          if (PlacesController.nodeIsFolder(this._resultNode))
-            return [TYPE_X_MOZ_PLACE_CONTAINER, TYPE_X_MOZ_PLACE_SEPARATOR, TYPE_X_MOZ_PLACE, TYPE_X_MOZ_URL];
-          else
-            return [];
-        </getter>
-      </property>
-
+      <!-- nsIPlacesView -->
+      <field name="peerDropIndex">0</field>
+      
+      <!-- nsIPlacesView -->
+      <field name="peerDropTypes">ViewConfig.GENERIC_DROP_TYPES</field>
+      
+      <!-- nsIPlacesView -->
+      <field name="childDropTypes">ViewConfig.GENERIC_DROP_TYPES</field>
+      
+      <!-- nsIPlacesView -->
+      <field name="excludeItems">false</field>
+      
+      <!-- nsIPlacesView -->
+      <field name="excludeQueries">false</field>
+      
+      <!-- nsIPlacesView -->
+      <field name="expandQueries">false</field>
+      
+      <!-- nsIPlacesView -->
+      <method name="selectAll">
+        <body><![CDATA[ 
+          // Nothing
+        ]]></body>
+      </method>
+      
+      <method name="saveSelection">
+        <parameter name="mode"/>
+        <body><![CDATA[
+        ]]></body>
+      </method>
+      <method name="restoreSelection">
+        <body><![CDATA[
+        ]]></body>
+      </method>
+      
       <!-- Checks whether and event should be acted on by this menu
            (It should be if the event affects one of this menu's child
             nodes) -->
