@@ -283,7 +283,7 @@ deleteThing: function(item)
 	{
 		var items = thing.parentNode;
 		items.removeChild(thing);
-		if (!items.firstChild)
+		if (!items.hasChildNodes())
 			items.parentNode.removeChild(items);
 	}
 	else
@@ -325,7 +325,7 @@ persistThings: function()
 	
 		try
 		{
-			if ((this.thingCache.documentElement)&&(this.thingCache.documentElement.firstChild))
+			if ((this.thingCache.documentElement)&&(this.thingCache.documentElement.hasChildNodes()))
 			{
 				var stream = Components.classes["@mozilla.org/network/file-output-stream;1"]
 				                       .createInstance(Components.interfaces.nsIFileOutputStream);

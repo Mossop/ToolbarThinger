@@ -59,7 +59,7 @@
           
           NS_ASSERT(this._settings && this._defaults, "Service returned bogus settings");
           
-          while (this.firstChild)
+          while (this.hasChildNodes())
             this.removeChild(this.firstChild);
             
           if ((!this.customised) && ("customise" in this))

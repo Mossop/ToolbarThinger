@@ -79,7 +79,7 @@
       
       <method name="_init">
         <body>
-          while (this.firstChild)
+          while (this.hasChildNodes())
             this.removeChild(this.firstChild);
             
          var gRDF = Components.classes["@mozilla.org/rdf/rdf-service;1"]

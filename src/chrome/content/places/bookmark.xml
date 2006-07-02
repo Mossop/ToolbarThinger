@@ -98,7 +98,7 @@
       
       <method name="_destroy">
         <body>
-          while (this.firstChild)
+          while (this.hasChildNodes())
             this.removeChild(this.firstChild);
         </body>
       </method>
