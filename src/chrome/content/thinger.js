@@ -45,6 +45,23 @@
 var thinger = {
 
 	service: null,
+	things: [],
+	
+	addAvailableThing: function(type)
+	{
+		if (this.things.indexOf(type)<0)
+			this.things.push(type);
+	},
+	
+	isThingAvailable: function(type)
+	{
+		return this.things.indexOf(type)>=0;
+	},
+	
+	getAvailableThings: function()
+	{
+		return this.things;
+	},
 	
 	findNextNode: function(node)
 	{
@@ -85,11 +102,11 @@ var thinger = {
 
 			try
 			{
-				this.service.importThings(toolbox);
+				this.service.importThings(this, toolbox);
 			}
 			catch (e)
 			{
-				dump(e+"\n");
+				Components.utils.reportError(e);
 			}
 			var toolbars = toolbox.getElementsByTagName("toolbar");
 			for (var i=0; i<toolbars.length; i++)
@@ -138,11 +155,16 @@ var thinger = {
 							}
 							if (seek)
 							{
-								node = seek;
-								id = seekid;
+								// Found a valid item. Skip it now to save us a loop.
+								node = this.findNextNode(seek.nextSibling);
+								id = this.getNodeId(node);
+								pos++;
 							}
 							else
+							{
+								// This item is invalid so skip it.
 								pos++;
+							}
 						}
 					}
 				}
@@ -152,3 +174,4 @@ var thinger = {
 }
 
 window.addEventListener("load", function(e) { thinger.init(e) }, false);
+thinger.addAvailableThing("script");

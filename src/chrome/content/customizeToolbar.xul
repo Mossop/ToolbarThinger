@@ -57,7 +57,6 @@
             ondraggesture="nsDragAndDrop.startDrag(event, dragStartObserver);"
             ondragover="nsDragAndDrop.dragOver(event, paletteDNDObserver);"
             ondragdrop="nsDragAndDrop.drop(event, paletteDNDObserver);">
-        <hbox/>
       </vbox>
       <separator class="groove"/>
     </vbox>

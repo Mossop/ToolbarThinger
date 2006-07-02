@@ -3,8 +3,10 @@
 <!DOCTYPE thinger SYSTEM "chrome://thinger/locale/defaults.dtd">
 
 <defaults xmlns="http://users.blueprintit.co.uk/~dave/web/firefox/Thinger" version="1">
-  <thing type="bookmark-item" root="place:&amp;folder=2&amp;group=3&amp;expandQueries=1" label="&thinger.bookmark-item.label;"/>
-  <thing type="bookmark-toolbar" root="place:&amp;folder=3&amp;group=3&amp;expandQueries=1" label="&thinger.bookmark-toolbar.label;"/>
+  <thing type="bookmark-item" label="&thinger.bookmark-item.label;"/>
+  <thing type="bookmark-toolbar" label="&thinger.bookmark-toolbar.label;"/>
+  <thing type="places-item" root="place:&amp;folder=2&amp;group=3&amp;expandQueries=1" label="&thinger.bookmark-item.label;"/>
+  <thing type="places-toolbar" root="place:&amp;folder=3&amp;group=3&amp;expandQueries=1" label="&thinger.bookmark-toolbar.label;"/>
   <thing type="search" label="&thinger.search.label;"/>
   <thing type="script" label="&thinger.script.label;"/>
 </defaults>

@@ -53,7 +53,7 @@
   </binding>
   
   <binding id="toolbar" extends="chrome://thinger/content/bindings/thing.xml#thing">
-    <content>
+    <content flex="1">
       <children/>
     </content>
 
@@ -94,6 +94,7 @@
           }
           catch (e)
           {
+            Components.utils.reportError(e);
           }
           while (this.firstChild)
             this.removeChild(this.firstChild);

@@ -57,6 +57,7 @@ var thinger = {
 		catch (e)
 		{
 			// This may be a bad thing but carry on anyway
+			Components.utils.reportError(e);
 		}
 		
 		if (gToolboxDocument.defaultView.thinger)
@@ -76,19 +77,30 @@ var thinger = {
 			mypalette.addEventListener("DOMNodeRemoved", thinger.paletteItemRemoved, false);
 			gToolbox.addEventListener("DOMNodeInserted", thinger.toolboxItemAdded, false);
 			
-			// Create the custom items.
-			mypalette.firstChild.appendChild(thinger.createCustom("bookmark-item"));
-			mypalette.firstChild.appendChild(thinger.createCustom("bookmark-toolbar"));
-			mypalette.firstChild.appendChild(thinger.createCustom("search"));
-			mypalette.firstChild.appendChild(thinger.createCustom("script"));
+			var things = gToolboxDocument.defaultView.thinger.getAvailableThings();
+			var row = null;
+			var spacer = null;
+			for (var i = 0; i<things.length; i++)
+			{
+				if ((i % 4) == 0)
+				{
+					if (row)
+					{
+						spacer = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul",
+						                                  "spacer");
+						spacer.setAttribute("flex", "0");
+						row.appendChild(spacer);
+					}
+					row = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "hbox");
+					mypalette.appendChild(row);
+				}
+				row.appendChild(thinger.createCustom(things[i]));
+			}
 	
-			var spacer = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul",
-			                                      "spacer");
+			spacer = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul",
+			                                  "spacer");
 			spacer.setAttribute("flex", "0");
-			mypalette.firstChild.appendChild(spacer);
-			
-			//thinger.windowHeight+=mypalette.parentNode.boxObject.height;
-			//repositionDialog();
+			row.appendChild(spacer);
 		}
 	},
 	
@@ -96,12 +108,10 @@ var thinger = {
 	{
 		if (gToolboxDocument.defaultView.thinger)
 		{
-			// Listen for things being removed from the toolbar.
 			var palette = document.getElementById("palette-box");
 			palette.removeEventListener("DOMNodeInserted", thinger.paletteItemAdded, false);
 			gToolbox.removeEventListener("DOMNodeRemoved", thinger.toolboxItemRemoved, false);
 			
-			// Listen for things being dropped onto the toolbar
 			var mypalette = document.getElementById("thinger-palette");
 			mypalette.removeEventListener("DOMNodeRemoved", thinger.paletteItemRemoved, false);
 			gToolbox.removeEventListener("DOMNodeInserted", thinger.toolboxItemAdded, false);
@@ -127,23 +137,6 @@ var thinger = {
 			thinger.service.persistThings();
 		}
 		thinger.oldOnAccept();
-	},
-	
-	repositionDialog: function()
-	{
-	  // Position the dialog touching the bottom of the toolbox and centered with 
-	  // it. We must resize the window smaller first so that it is positioned 
-	  // properly. 
-	  var screenX = gToolbox.boxObject.screenX + ((gToolbox.boxObject.width - kWindowWidth) / 2);
-	  var screenY = gToolbox.boxObject.screenY + gToolbox.boxObject.height;
-	
-	  var newHeight = thinger.windowHeight;
-	  if (newHeight >= screen.availHeight - screenY - kVSizeSlop) {
-	    newHeight = screen.availHeight - screenY - kVSizeSlop;
-	  }
-	
-	  window.resizeTo(kWindowWidth, newHeight);
-	  window.moveTo(screenX, screenY);
 	},
 	
 	addCustomiser: function(item)
@@ -314,4 +307,3 @@ onLoad = thinger.onLoad;
 
 thinger.oldOnAccept = onAccept;
 onAccept = thinger.onAccept;
-

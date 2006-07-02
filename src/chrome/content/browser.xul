@@ -42,12 +42,8 @@
    - $Revision$
    -->
 
-<?xml-stylesheet href="chrome://thinger/skin/thinger.css" type="text/css"?>
-<?xml-stylesheet href="chrome://thinger/content/bindings/bindings.css" type="text/css"?>
+<overlay id="ThingerBrowserOverlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-<overlay id="ThingerOverlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-
-	<script type="application/x-javascript" src="chrome://global/content/debug.js"/>
-	<script type="application/x-javascript" insertbefore="stringbundleset" src="thinger.js"/>
+	<script type="application/x-javascript" src="browser.js"/>
 
 </overlay>

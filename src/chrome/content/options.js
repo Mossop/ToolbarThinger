@@ -59,7 +59,15 @@ function persistSettings()
 	                        .getService(Components.interfaces.mIThingerService);
 	setAttribute("customised", "true");
 	service.persistThings();
-	thing.update();
+	try
+	{
+		thing.update();
+	}
+	catch (e)
+	{
+		// Something nasty happened in the thing's init method
+		Components.utils.reportError(e);
+	}
 }
 
 function getAttribute(name, def)

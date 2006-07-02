@@ -1,3 +1,16 @@
+toolbar .thinger-item[thingtype="places-item"] {
+  -moz-binding: url('chrome://thinger/content/places/bookmark.xml#bookmark');
+}
+
+toolbar .thinger-item[thingtype="places-toolbar"] {
+  -moz-binding: url('chrome://thinger/content/places/toolbar.xml#toolbar');
+}
+
+.thinger-placesbar {
+  -moz-binding: url('chrome://thinger/content/places/toolbar.xml#places-bar');
+  overflow: hidden;
+}
+
 toolbar .thinger-item[thingtype="bookmark-item"] {
   -moz-binding: url('chrome://thinger/content/bookmarks/bookmark.xml#bookmark');
 }

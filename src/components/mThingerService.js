@@ -292,7 +292,7 @@ deleteThing: function(item)
 	}
 },
 
-importThings: function(toolbox)
+importThings: function(controller, toolbox)
 {
 	var things = this.things;
 	
@@ -306,11 +306,9 @@ importThings: function(toolbox)
 		var thing = items.firstChild;
 		while (thing)
 		{
-			if (thing.nodeType==things.ELEMENT_NODE)
-			{
+			if ((thing.nodeType==things.ELEMENT_NODE) && (controller.isThingAvailable(thing.getAttribute("type"))))
 				this.createToolbarItem(toolbox.palette, thing);
-				thing=thing.nextSibling;
-			}
+			thing=thing.nextSibling;
 		}
 	}
 },

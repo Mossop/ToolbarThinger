@@ -10,6 +10,14 @@
   list-style-image: url('chrome://thinger/skin/toolbar.png');
 }
 
+.thinger-item[thingtype="places-item"] {
+  list-style-image: url('chrome://thinger/skin/bookmark.png');
+}
+
+.thinger-item[thingtype="places-toolbar"] {
+  list-style-image: url('chrome://thinger/skin/toolbar.png');
+}
+
 #thinger-palette .thinger-item[thingtype="search"] {
   list-style-image: url('chrome://thinger/skin/search.png');
 }
@@ -23,5 +31,9 @@
 }
 
 .thinger-item[thingtype="bookmark-toolbar"] .bookmarks-toolbar-customize {
+  list-style-image: url('chrome://thinger/skin/toolbar.png') !important;
+}
+
+.thinger-item[thingtype="places-toolbar"] .bookmarks-toolbar-customize {
   list-style-image: url('chrome://thinger/skin/toolbar.png') !important;
 }

@@ -6,6 +6,4 @@ locale			thinger							en-US														${extension.chromebase}/locale/en-US/
 overlay			chrome://global/content/customizeToolbar.xul				chrome://thinger/content/customizeToolbar.xul
 
 overlay			chrome://browser/content/browser.xul								chrome://thinger/content/thinger.xul
-
-style				chrome://browser/content/browser.xul								chrome://thinger/content/bindings/bindings2.css		appversion<3.0a1
-style				chrome://browser/content/browser.xul								chrome://thinger/content/bindings/bindings3.css		appversion>=3.0a1
+overlay			chrome://browser/content/browser.xul								chrome://thinger/content/browser.xul

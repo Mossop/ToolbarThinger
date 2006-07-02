@@ -35,16 +35,24 @@
  *
  * ***** END LICENSE BLOCK *****
  *
- * $HeadURL: svn://svn.blueprintit.co.uk/dave/mozilla/firefox/TabSidebar/trunk/chrome/content/browser.js $
- * $LastChangedBy: dave $
- * $Date: 2005-12-18 16:02:04 +0000 (Sun, 18 Dec 2005) $
- * $Revision: 346 $
+ * $HeadURL$
+ * $LastChangedBy$
+ * $Date$
+ * $Revision$
  *
  */
 #include "nsISupports.idl"
 
 interface nsIDOMXULElement;
 interface nsIDOMElement;
+
+[scriptable, uuid(38f32db8-2763-4eac-bf25-2df1fd83dc9f)]
+interface mIThingerController : nsISupports
+{
+	void addAvailableThing(in AString type);
+	
+	boolean isThingAvailable(in AString type);
+};
 
 [scriptable, uuid(71c2b345-cc26-4be3-b9d9-8c9384771687)]
 interface mIThingerService : nsISupports
@@ -57,7 +65,7 @@ interface mIThingerService : nsISupports
 	
 	void deleteThing(in nsIDOMXULElement thing);
 	
-	void importThings(in nsIDOMXULElement toolbox);
+	void importThings(in mIThingerController controller, in nsIDOMXULElement toolbox);
 	
 	void persistThings();
 };
