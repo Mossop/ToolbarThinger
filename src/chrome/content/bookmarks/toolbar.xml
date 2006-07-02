@@ -95,7 +95,7 @@
                                .getService(Components.interfaces.nsIRDFService);
           var resource = gRDF.GetResource(this._getAttribute("root"));
           var nameprop = gRDF.GetResource("http://home.netscape.com/NC-rdf#Name");
-          var db = gRDF.GetDataSource("rdf:bookmarks");
+          var db = this._bookmarkBar.database;
           var label = db.GetTarget(resource, nameprop, true);
           label = label.QueryInterface(Components.interfaces.nsIRDFLiteral).Value;
           this._barLabel.setAttribute("label", label+" Items");
@@ -124,7 +124,7 @@
         <body>
           var gRDF = Components.classes["@mozilla.org/rdf/rdf-service;1"]
                                .getService(Components.interfaces.nsIRDFService);
-          var db = gRDF.GetDataSource("rdf:bookmarks");
+          var db = this._bookmarkBar.database;
           try {
            db.database.RemoveObserver(this);
           } catch (ex) {
@@ -262,6 +262,8 @@
       <method name="onEndUpdateBatch">
         <parameter name="aDataSource"/>
         <body>
+          if (this._overflowTimerInEffect)
+            return;
           this._overflowTimerInEffect = true;
           setTimeout(this.resizeFuncListener, 0, null);
         </body>
