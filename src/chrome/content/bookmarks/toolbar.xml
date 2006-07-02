@@ -58,21 +58,41 @@
               onclick="this.parentNode.parentNode.onClick(event)"
               onpopupshowing="this.parentNode.parentNode.onPopupShowing(event)"
               onpopuphidden="this.parentNode.parentNode.onPopupHidden(event)"/>
+        <xul:hbox class="bookmarks-toolbar-overflow-items" mousethrough="always">
+          <xul:hbox mousethrough="always" class="overflow-padder"/>
+          <xul:toolbarbutton type="menu" class="chevron"
+                         mousethrough="never" collapsed="true" 
+                         datasources="rdf:bookmarks rdf:files"
+                         template="bookmarks-template" flags="dont-test-empty">
+            <xul:menupopup onpopupshowing="this.parentNode.parentNode.parentNode.parentNode.updateOverflowMenu();"/>
+          </xul:toolbarbutton>
+        </xul:hbox>
         <xul:toolbarbutton class="bookmark-item bookmarks-toolbar-customize" mousethrough="never"
                            label=""/>
       </xul:stack>
     </content>
 
-    <implementation>
+    <implementation implements="nsIRDFObserver">
       <field name="openedMenuButton"/>
+      <field name="_overflowTimerInEffect">false</field>
       <property name="_bookmarkBar" onget="return document.getAnonymousNodes(this)[0].childNodes[0]"/>
-      <property name="_barLabel" onget="return document.getAnonymousNodes(this)[0].childNodes[1]"/>
-
+      <property name="_barLabel" onget="return document.getAnonymousNodes(this)[0].childNodes[2]"/>
+      <property name="_chevron" onget="return document.getAnonymousNodes(this)[0].childNodes[1].childNodes[1]"/>
+      
+      <field name="resizeFuncListener"/>
+      
       <method name="_init">
+        <body>
+          var self = this;
+          this.resizeFuncListener = function(e) { self.resizeFunc(e) };
+          setTimeout(function() { self._delayedInit() }, 0, null);
+        </body>
+      </method>
+
+      <method name="_delayedInit">
         <body>
           var gRDF = Components.classes["@mozilla.org/rdf/rdf-service;1"]
                                .getService(Components.interfaces.nsIRDFService);
-          this._bookmarkBar.ref = this._getAttribute("root");
           var resource = gRDF.GetResource(this._getAttribute("root"));
           var nameprop = gRDF.GetResource("http://home.netscape.com/NC-rdf#Name");
           var db = gRDF.GetDataSource("rdf:bookmarks");
@@ -80,11 +100,38 @@
           label = label.QueryInterface(Components.interfaces.nsIRDFLiteral).Value;
           this._barLabel.setAttribute("label", label+" Items");
           this._settings.setAttribute("label", label+" Items");
+          
+          this._bookmarkBar.ref = this._getAttribute("root");
+          this._chevron.ref = this._getAttribute("root");
+
+          try {
+           db.RemoveObserver(this);
+          } catch (ex) {
+           // ignore
+          }
+          db.AddObserver(this);
+          this._bookmarkBar.builder.rebuild();
+          this._chevron.builder.rebuild();
+          
+          this._overflowTimerInEffect = true;
+          setTimeout(this.resizeFuncListener, 0, null);
+          
+          window.addEventListener("resize", this.resizeFuncListener, false);
         </body>
       </method>
-
+      
       <method name="_destroy">
         <body>
+          var gRDF = Components.classes["@mozilla.org/rdf/rdf-service;1"]
+                               .getService(Components.interfaces.nsIRDFService);
+          var db = gRDF.GetDataSource("rdf:bookmarks");
+          try {
+           db.database.RemoveObserver(this);
+          } catch (ex) {
+           // ignore
+          }
+
+          window.removeEventListener("resize", this.resizeFunc, false);
         </body>
       </method>
 
@@ -94,6 +141,145 @@
         </body>
       </method>
       
+      <method name="updateOverflowMenu">
+        <body>
+        <![CDATA[
+          var aMenuPopup = this._chevron.firstChild;
+          var hbox = this._bookmarkBar;
+          for (var i = 0; i < hbox.childNodes.length; i++) {
+            var button = hbox.childNodes[i];
+            var menu = aMenuPopup.childNodes[i];
+            if (menu.collapsed == button.collapsed)
+              menu.collapsed = !menu.collapsed;
+          }
+        ]]>
+        </body>
+      </method>
+
+      <method name="resizeFunc">
+        <parameter name="event"/>
+        <body>
+        <![CDATA[
+          if (event && event.type == 'focus') 
+            window.removeEventListener('focus', this.resizeFuncListener, false); // hack for bug 266737
+          var buttons = this._bookmarkBar;
+          var chevron = this._chevron;
+          var width = window.innerWidth;
+          if (width == 0) {  // hack for bug 266737
+            window.addEventListener('focus', this.resizeFuncListener, false);
+            return;
+          }
+          var myToolbar = this.parentNode;
+          for (var i = myToolbar.childNodes.length-1; i >= 0; i--){
+            var anItem = myToolbar.childNodes[i];
+            if (anItem.id == this.id) {
+              break;
+            }
+            width -= anItem.boxObject.width;
+          }
+          var chevronWidth = 0;
+          chevron.collapsed = false;
+          chevronWidth = chevron.boxObject.width;
+          chevron.collapsed = true;
+          var overflowed = false;
+      
+          var isLTR=window.getComputedStyle(document.getElementById("PersonalToolbar"),'').direction=='ltr';
+      
+          for (var i=0; i<buttons.childNodes.length; i++) {
+            var button = buttons.childNodes[i];
+            button.collapsed = overflowed;
+            
+            if (i == buttons.childNodes.length - 1) // last ptf item...
+              chevronWidth = 0;
+            var offset = isLTR ? button.boxObject.x 
+                               : width - button.boxObject.x;
+            if (offset + button.boxObject.width + chevronWidth > width) {
+               overflowed = true;
+              // This button doesn't fit. Show it in the menu. Hide it in the toolbar.
+              if (!button.collapsed)
+                button.collapsed = true;
+              if (chevron.collapsed) {
+                chevron.collapsed = false;
+                var overflowPadder = document.getAnonymousNodes(this)[0].childNodes[1].childNodes[0];
+                offset = isLTR ? buttons.boxObject.x 
+                               : width - buttons.boxObject.x - buttons.boxObject.width;
+                overflowPadder.width = width - chevron.boxObject.width - offset;
+              }
+            }
+          }
+          this._overflowTimerInEffect = false;
+        ]]>
+        </body>
+      </method>
+      
+      <method name="onAssert">
+        <parameter name="aDataSource"/>
+        <parameter name="aSource"/>
+        <parameter name="aProperty"/>
+        <parameter name="aTarget"/>
+        <body>
+          this.setOverflowTimeout(aSource, aProperty);
+        </body>
+      </method>
+
+      <method name="onUnassert">
+        <parameter name="aDataSource"/>
+        <parameter name="aSource"/>
+        <parameter name="aProperty"/>
+        <parameter name="aTarget"/>
+        <body>
+          this.setOverflowTimeout(aSource, aProperty);
+        </body>
+      </method>
+
+      <method name="onChange">
+        <parameter name="aDataSource"/>
+        <parameter name="aSource"/>
+        <parameter name="aProperty"/>
+        <parameter name="aOldTarget"/>
+        <parameter name="aNewTarget"/>
+        <body>
+          this.setOverflowTimeout(aSource, aProperty);
+        </body>
+      </method>
+
+      <method name="onMove">
+        <parameter name="aDataSource"/>
+        <parameter name="aOldSource"/>
+        <parameter name="aNewSource"/>
+        <parameter name="aProperty"/>
+        <parameter name="Target"/>
+        <body>
+        </body>
+      </method>
+
+      <method name="onBeginUpdateBatch">
+        <parameter name="aDataSource"/>
+        <body>
+        </body>
+      </method>
+
+      <method name="onEndUpdateBatch">
+        <parameter name="aDataSource"/>
+        <body>
+          this._overflowTimerInEffect = true;
+          setTimeout(this.resizeFuncListener, 0, null);
+        </body>
+      </method>
+
+      <method name="setOverflowTimeout">
+        <parameter name="aSource"/>
+        <parameter name="aProperty"/>
+        <body>
+          if (this._overflowTimerInEffect)
+            return;
+          if (aProperty.Value == gWEB_NS+"LastModifiedDate")
+            return;
+          this._overflowTimerInEffect = true;
+          setTimeout(this.resizeFuncListener, 0, null);
+        </body>
+      </method>
+
       <method name="onCommand">
         <parameter name="event"/>
         <body>
@@ -113,8 +299,8 @@
       <method name="onPopupShowing">
         <parameter name="event"/>
         <body>
-          BookmarksMenu.onShowMenu(event.target);
-          BookmarksToolbar.setOpenedMenu(event);
+          if (event.originalTarget.parentNode == this)
+            BookmarksToolbar.setOpenedMenu(event);
         </body>
       </method>
 
@@ -122,7 +308,8 @@
         <parameter name="event"/>
         <body>
           BookmarksMenu.onHideMenu(event.target);
-          BookmarksToolbar.unsetOpenedMenu(event);
+          if (event.originalTarget.parentNode == this)
+            BookmarksToolbar.unsetOpenedMenu(event);
         </body>
       </method>
     </implementation>
