@@ -1,3 +1,5 @@
+@namespace html url("http://www.w3.org/1999/xhtml");
+
 .thinger-customise {
   list-style-image: url('chrome://thinger/skin/options.png');
 }
@@ -28,6 +30,14 @@
 
 .thinger-searchbar[empty="true"] .searchbar-textbox {
   color: graytext;
+}
+
+.thinger-searchbar .search-go-button {
+	border: 0px none !important;
+}
+
+toolbarpaletteitem .thinger-item[thingtype="search"] html|*.textbox-input {
+	visibility: hidden;
 }
 
 .thinger-item[thingtype="bookmark-toolbar"] .bookmarks-toolbar-customize {
