@@ -49,6 +49,8 @@ function onLoad()
 	tree = document.getElementById("bookmarksTree");
 	if (args.onlyFolders)
 		tree.setAttribute("type", "folders");
+	else
+		tree.setAttribute("type", "single-column");
 }
 
 function onAccept()

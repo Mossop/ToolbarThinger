@@ -12,7 +12,7 @@ function init_browser_things(event)
 	if (vc.compare(version, "2.0a3")>=0)
 		thinger.addAvailableThing("search");
 	
-	if (vc.compare(version, "3.0a1")>=0)
+	if (!Components.interfaces.nsIBookmarksService)
 	{
 		thinger.addAvailableThing("places-item");
 		thinger.addAvailableThing("places-toolbar");

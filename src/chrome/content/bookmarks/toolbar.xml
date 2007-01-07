@@ -81,6 +81,41 @@
       
       <field name="resizeFuncListener"/>
       
+			<field name="_observer"><![CDATA[({
+				thing: this,
+				
+				onAssert: function(dataSource, source, property, target)
+				{
+          this.thing.setOverflowTimeout(source, property);
+				},
+				
+				onBeginUpdateBatch: function(dataSource)
+				{
+				},
+				
+				onChange: function(dataSource, source, property, oldTarget, newTarget)
+				{
+          this.thing.setOverflowTimeout(aSource, aProperty);
+				},
+				
+				onEndUpdateBatch: function(dataSource)
+				{
+          if (this.thing._overflowTimerInEffect)
+            return;
+          this.thing._overflowTimerInEffect = true;
+          setTimeout(this.thing.resizeFuncListener, 0, null);
+				},
+				
+				onMove: function(dataSource, oldSource, newSource, property, target)
+				{
+				},
+				
+				onUnassert: function(dataSource, source, property, target)
+				{
+          this.thing.setOverflowTimeout(source, property);
+				}
+			});]]></field>
+			
       <method name="_init">
         <body>
           var self = this;
@@ -109,7 +144,7 @@
           } catch (ex) {
            // ignore
           }
-          db.AddObserver(this);
+          db.AddObserver(this._observer);
           this._bookmarkBar.builder.rebuild();
           this._chevron.builder.rebuild();
           
@@ -126,7 +161,7 @@
                                .getService(Components.interfaces.nsIRDFService);
           var db = this._bookmarkBar.database;
           try {
-           db.database.RemoveObserver(this);
+           db.database.RemoveObserver(this._observer);
           } catch (ex) {
            // ignore
           }
@@ -212,63 +247,6 @@
         </body>
       </method>
       
-      <method name="onAssert">
-        <parameter name="aDataSource"/>
-        <parameter name="aSource"/>
-        <parameter name="aProperty"/>
-        <parameter name="aTarget"/>
-        <body>
-          this.setOverflowTimeout(aSource, aProperty);
-        </body>
-      </method>
-
-      <method name="onUnassert">
-        <parameter name="aDataSource"/>
-        <parameter name="aSource"/>
-        <parameter name="aProperty"/>
-        <parameter name="aTarget"/>
-        <body>
-          this.setOverflowTimeout(aSource, aProperty);
-        </body>
-      </method>
-
-      <method name="onChange">
-        <parameter name="aDataSource"/>
-        <parameter name="aSource"/>
-        <parameter name="aProperty"/>
-        <parameter name="aOldTarget"/>
-        <parameter name="aNewTarget"/>
-        <body>
-          this.setOverflowTimeout(aSource, aProperty);
-        </body>
-      </method>
-
-      <method name="onMove">
-        <parameter name="aDataSource"/>
-        <parameter name="aOldSource"/>
-        <parameter name="aNewSource"/>
-        <parameter name="aProperty"/>
-        <parameter name="Target"/>
-        <body>
-        </body>
-      </method>
-
-      <method name="onBeginUpdateBatch">
-        <parameter name="aDataSource"/>
-        <body>
-        </body>
-      </method>
-
-      <method name="onEndUpdateBatch">
-        <parameter name="aDataSource"/>
-        <body>
-          if (this._overflowTimerInEffect)
-            return;
-          this._overflowTimerInEffect = true;
-          setTimeout(this.resizeFuncListener, 0, null);
-        </body>
-      </method>
-
       <method name="setOverflowTimeout">
         <parameter name="aSource"/>
         <parameter name="aProperty"/>

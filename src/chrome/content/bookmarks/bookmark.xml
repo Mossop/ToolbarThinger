@@ -59,16 +59,75 @@
     </content>
 
     <implementation>
+      <field name="_gRDF">null</field>
       <field name="_database">null</field>
+      <field name="_resource">null</field>
 
+			<field name="_observer"><![CDATA[({
+				thing: this,
+				needsUpdate: false,
+				inBatch: 0,
+				
+				rebuild: function()
+				{
+					if (this.inBatch==0)
+						this.thing._rebuild();
+					else
+						this.needsUpdate = true;
+				},
+				
+				onAssert: function(dataSource, source, property, target)
+				{
+					if (source == this.thing._resource)
+						this.rebuild();
+				},
+				
+				onBeginUpdateBatch: function(dataSource)
+				{
+					this.inBatch++;
+				},
+				
+				onChange: function(dataSource, source, property, oldTarget, newTarget)
+				{
+					if (source == this.thing._resource)
+						this.rebuild();
+				},
+				
+				onEndUpdateBatch: function(dataSource)
+				{
+					this.inBatch--;
+					if ((this.inBatch == 0) && (this.needsUpdate))
+					{
+						this.needsUpdate = false;
+						this.thing._rebuild();
+					}
+				},
+				
+				onMove: function(dataSource, oldSource, newSource, property, target)
+				{
+					if ((oldSource == this.thing._resource) || (newSource == this.thing._resource))
+						this.rebuild();
+				},
+				
+				onUnassert: function(dataSource, source, property, target)
+				{
+					if (source == this.thing._resource)
+						this.rebuild();
+					/*if (target == this.thing._resource)
+					{
+						var arcs = dataSource.ArcLabelsIn(target);
+						if (!arcs.hasMoreElements())
+							this.thing.delete();
+					}*/
+				}
+			});]]></field>
+			
       <method name="_getLiteral">
-        <parameter name="gRDF"/>
-        <parameter name="ds"/>
         <parameter name="resource"/>
         <parameter name="property"/>
         <body>
-          var prop = gRDF.GetResource(property);
-          var result = ds.GetTarget(resource, prop, true);
+          var prop = this._gRDF.GetResource(property);
+          var result = this._database.GetTarget(resource, prop, true);
           if (result instanceof Components.interfaces.nsIRDFLiteral)
             return result.Value;
           else if (result instanceof Components.interfaces.nsIRDFResource)
@@ -79,15 +138,27 @@
       
       <method name="_init">
         <body>
+          this._gRDF = Components.classes["@mozilla.org/rdf/rdf-service;1"]
+                                 .getService(Components.interfaces.nsIRDFService);
+          this._database = this._gRDF.GetDataSource("rdf:bookmarks");
+          this._resource = this._gRDF.GetResource(this._getAttribute("root"));
+        	this._rebuild();
+        	if (this._database)
+	        	this._database.AddObserver(this._observer);
+        </body>
+      </method>
+
+			<method name="_rebuild">
+				<body>
           while (this.hasChildNodes())
             this.removeChild(this.firstChild);
             
-         var gRDF = Components.classes["@mozilla.org/rdf/rdf-service;1"]
-                               .getService(Components.interfaces.nsIRDFService);
-          var resource = gRDF.GetResource(this._getAttribute("root"));
-          var ds = gRDF.GetDataSource("rdf:bookmarks");
-          this._database = ds;
-          var type = this._getLiteral(gRDF, ds, resource, "http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+          var type = this._getLiteral(this._resource, "http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+          /*if (type == '')
+          {
+          	this.delete();
+          	return;
+          }*/
           
           var button = document.createElementNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "toolbarbutton");
           button.setAttribute("id", this._getAttribute("root"));
@@ -101,7 +172,7 @@
             button.setAttribute("container", "true");
             button.setAttribute("editable", "true");
             button.setAttributeNS("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "type", "http://home.netscape.com/NC-rdf#Folder");
-            button.setAttribute("label", this._getLiteral(gRDF, ds, resource, "http://home.netscape.com/NC-rdf#Name"));
+            button.setAttribute("label", this._getLiteral(this._resource, "http://home.netscape.com/NC-rdf#Name"));
             if (type == 'http://home.netscape.com/NC-rdf#Livemark')
               button.setAttribute("livemark", "true");
             button.setAttribute("template", "bookmarks-template");
@@ -115,26 +186,31 @@
             button.setAttribute("editable", "true");
             button.setAttribute("tooltip", "btTooltip");
             button.setAttributeNS("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "type", "http://home.netscape.com/NC-rdf#Bookmark");
-          	button.setAttribute("status", this._getLiteral(gRDF, ds, resource, "http://home.netscape.com/WEB-rdf#status"));
-            button.setAttribute("image", this._getLiteral(gRDF, ds, resource, "http://home.netscape.com/NC-rdf#Icon"));
-            button.setAttribute("statustext", this._getLiteral(gRDF, ds, resource, "http://home.netscape.com/NC-rdf#URL"));
+          	button.setAttribute("status", this._getLiteral(this._resource, "http://home.netscape.com/WEB-rdf#status"));
+            button.setAttribute("image", this._getLiteral(this._resource, "http://home.netscape.com/NC-rdf#Icon"));
+            button.setAttribute("statustext", this._getLiteral(this._resource, "http://home.netscape.com/NC-rdf#URL"));
             if (type == 'http://home.netscape.com/NC-rdf#MicsumBookmark')
             {
-              button.setAttribute("label", this._getLiteral(gRDF, ds, resource, "http://home.netscape.com/NC-rdf#GeneratedTitle"));
+              button.setAttribute("label", this._getLiteral(this._resource, "http://home.netscape.com/NC-rdf#GeneratedTitle"));
               button.className += " bookmark-item-microsummarized";
             }
             else
             {
-              button.setAttribute("label", this._getLiteral(gRDF, ds, resource, "http://home.netscape.com/NC-rdf#Name"));
+              button.setAttribute("label", this._getLiteral(this._resource, "http://home.netscape.com/NC-rdf#Name"));
             }
           }
           this._settings.setAttribute("label", button.getAttribute("label"));
           this.appendChild(button);
-        </body>
-      </method>
-
+				</body>
+			</method>
+			
       <method name="_destroy">
         <body>
+        	if (this._database)
+	        	this._database.RemoveObserver(this._observer);
+        	this._gRDF = null;
+        	this._database = null;
+        	this._resource = null;
         </body>
       </method>
 

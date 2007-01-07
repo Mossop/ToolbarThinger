@@ -203,6 +203,28 @@
         </body>
       </method>
 
+      <method name="delete">
+        <body>
+        <![CDATA[
+          NS_ASSERT(this._settings && this._service, "Thing not properly initialised");
+          
+          dump("Deleting\n");
+          this._destroy();
+         	this._service.deleteThing(this);
+         	this._service.persistThings();
+					var node = this;
+         	var toolbar = this.parentNode;
+         	if (toolbar.localName == 'toolbarpaletteitem')
+         	{
+         		node = toolbar;
+         		toolbar = toolbar.parentNode;
+         	}
+         	toolbar.removeChild(node);
+         	toolbar.setAttribute("currentset", toolbar.currentSet);
+        ]]>
+        </body>
+      </method>
+
       <method name="_destroy">
         <body>
         </body>

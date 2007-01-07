@@ -46,7 +46,7 @@ var thinger = {
 	
 	service: null,
 	oldOnLoad: null,
-	oldOnAccept: null,
+	oldFinishToolbarCustomization: null,
 
 	onLoad: function(event)
 	{
@@ -104,39 +104,46 @@ var thinger = {
 		}
 	},
 	
-	onAccept: function(event)
+	finishToolbarCustomization: function(event)
 	{
-		if (gToolboxDocument.defaultView.thinger)
+		try
 		{
-			var palette = document.getElementById("palette-box");
-			palette.removeEventListener("DOMNodeInserted", thinger.paletteItemAdded, false);
-			gToolbox.removeEventListener("DOMNodeRemoved", thinger.toolboxItemRemoved, false);
-			
-			var mypalette = document.getElementById("thinger-palette");
-			mypalette.removeEventListener("DOMNodeRemoved", thinger.paletteItemRemoved, false);
-			gToolbox.removeEventListener("DOMNodeInserted", thinger.toolboxItemAdded, false);
-	
-			thinger.removeCustomisation();
-	
-			// Wipe the custom thing.
-			var mypalette = document.getElementById("thinger-palette");
-			var row = mypalette.firstChild;
-			while (row)
+			if (gToolboxDocument.defaultView.thinger)
 			{
-				var wrapper = row.firstChild;
-				while (wrapper)
+				var palette = document.getElementById("palette-box");
+				palette.removeEventListener("DOMNodeInserted", thinger.paletteItemAdded, false);
+				gToolbox.removeEventListener("DOMNodeRemoved", thinger.toolboxItemRemoved, false);
+				
+				var mypalette = document.getElementById("thinger-palette");
+				mypalette.removeEventListener("DOMNodeRemoved", thinger.paletteItemRemoved, false);
+				gToolbox.removeEventListener("DOMNodeInserted", thinger.toolboxItemAdded, false);
+		
+				thinger.removeCustomisation();
+		
+				// Wipe the custom thing.
+				var mypalette = document.getElementById("thinger-palette");
+				var row = mypalette.firstChild;
+				while (row)
 				{
-					if (wrapper.id.substring(0,16)=="wrapper-thinger-")
-						thinger.deleteItem(wrapper);
-					wrapper=wrapper.nextSibling;
+					var wrapper = row.firstChild;
+					while (wrapper)
+					{
+						if (wrapper.id.substring(0,16)=="wrapper-thinger-")
+							thinger.deleteItem(wrapper);
+						wrapper=wrapper.nextSibling;
+					}
+					row=row.nextSibling;
 				}
-				row=row.nextSibling;
+						
+				// Persist the thing cache.
+				thinger.service.persistThings();
 			}
-					
-			// Persist the thing cache.
-			thinger.service.persistThings();
 		}
-		thinger.oldOnAccept();
+		catch (e)
+		{
+			dump(e+"\n");
+		}
+		thinger.oldFinishToolbarCustomization();
 	},
 	
 	addCustomiser: function(item)
@@ -306,5 +313,5 @@ var thinger = {
 thinger.oldOnLoad = onLoad;
 onLoad = thinger.onLoad;
 
-thinger.oldOnAccept = onAccept;
-onAccept = thinger.onAccept;
+thinger.oldFinishToolbarCustomization = finishToolbarCustomization;
+finishToolbarCustomization = thinger.finishToolbarCustomization;
