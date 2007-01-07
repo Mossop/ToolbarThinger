@@ -46,7 +46,7 @@
           xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
   <binding id="search" extends="chrome://thinger/content/bindings/thing.xml#thing">
-    <content flex="100">
+    <content align="center" flex="100">
       <searchbar flex="1" class="thinger-searchbar" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"/>
     </content>
 

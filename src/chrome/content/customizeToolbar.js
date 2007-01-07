@@ -216,7 +216,9 @@ var thinger = {
 		wrapper.setAttribute("pack", "center");
 		wrapper.setAttribute("minheight", "0");
 		wrapper.setAttribute("minwidth", "0");
-		document.adoptNode(newthing);
+		try {
+			document.adoptNode(newthing);
+		} catch (e) { }
 		wrapper.appendChild(newthing);
 		cleanUpItemForPalette(newthing, wrapper);
 		
