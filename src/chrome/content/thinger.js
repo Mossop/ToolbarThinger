@@ -89,8 +89,10 @@ var thinger = {
       return node.id;
 	},
 	
-	init: function(event)
+	init: function()
 	{
+		window.removeEventListener("load", this, false);
+		
 		this.service = Components.classes["@blueprintit.co.uk/thinger-service;1"]
 		                         .getService(Components.interfaces.mIThingerService);
 		
@@ -170,8 +172,18 @@ var thinger = {
 				}
 			}
 		}
+	},
+	
+	handleEvent: function(event)
+	{
+		switch (event.type)
+		{
+			case "load":
+				this.init();
+				break;
+		}
 	}
 }
 
-window.addEventListener("load", function(e) { thinger.init(e) }, false);
+window.addEventListener("load", thinger, false);
 thinger.addAvailableThing("script");

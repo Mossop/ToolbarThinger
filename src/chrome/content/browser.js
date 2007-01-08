@@ -22,6 +22,8 @@ function init_browser_things(event)
 		thinger.addAvailableThing("bookmark-item");
 		thinger.addAvailableThing("bookmark-toolbar");
 	}
+	
+	window.removeEventListener("DOMContentLoaded", init_browser_things, false);
 }
 
 window.addEventListener("DOMContentLoaded", init_browser_things, false);
