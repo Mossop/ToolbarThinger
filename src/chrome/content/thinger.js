@@ -98,10 +98,9 @@ var thinger = {
 		
 		var toolboxes = document.getElementsByTagNameNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "toolbox");
 
-		for (var i=0; i<toolboxes.length; i++)
+		for (var j=0; j<toolboxes.length; j++)
 		{
-			var toolbox = toolboxes[i];
-
+			var toolbox = toolboxes[j];
 			try
 			{
 				this.service.importThings(this, toolbox);
@@ -110,7 +109,7 @@ var thinger = {
 			{
 				Components.utils.reportError(e);
 			}
-			var toolbars = toolbox.getElementsByTagName("toolbar");
+			var toolbars = toolbox.getElementsByTagNameNS("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul", "toolbar");
 			for (var i=0; i<toolbars.length; i++)
 			{
 				// We have to manually add in custom elements to the toolbar.
