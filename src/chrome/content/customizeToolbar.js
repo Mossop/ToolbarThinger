@@ -45,21 +45,11 @@
 var thinger = {
 	
 	service: null,
-	oldOnLoad: null,
 	oldFinishToolbarCustomization: null,
 
-	onLoad: function(event)
+	setupThingerPalette: function(event)
 	{
-		try
-		{
-			thinger.oldOnLoad();
-		}
-		catch (e)
-		{
-			// This may be a bad thing but carry on anyway
-			Components.utils.reportError(e);
-		}
-		
+		window.removeEventListener("load", thinger.setupThingerPalette, false);
 		if (gToolboxDocument.defaultView.thinger)
 		{
 			thinger.setupCustomisation();
@@ -312,8 +302,7 @@ var thinger = {
 	}
 }
 
-thinger.oldOnLoad = onLoad;
-onLoad = thinger.onLoad;
+window.addEventListener("load", thinger.setupThingerPalette, false);
 
 thinger.oldFinishToolbarCustomization = finishToolbarCustomization;
 finishToolbarCustomization = thinger.finishToolbarCustomization;
